@@ -1,3 +1,7 @@
+06/22/12:
+	Removed "test" directory, obviously not supposed to be there
+	Modified Makefile to exclude git on release
+
 06/18/12: Released as Version 1.0.4
 
 06/15/12:
