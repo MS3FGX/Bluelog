@@ -1,0 +1,120 @@
+/* Backtrack themed CSS for Bluelog Live*/
+html, body
+{
+	margin: 0; 
+	padding: 0;
+	height: 100%;
+	background-color: #000000;
+	font-family: arial,veranda,sans-serif;
+	color: #FFFFFF;
+	font-size: 12px;
+	overflow: hidden;
+}
+
+/* Used for footer link */
+h4, h4 a
+{
+	position: relative;
+	text-align: right;
+	margin-top: 4px;
+	right: 2px;
+	color: #cccccc;
+	font-size: 10px;
+}
+
+#header
+{
+	/* Logo, can change in CSS without touching HTML */
+	background-image: url('images/backtrack_logo.png');
+	background-repeat: no-repeat;
+	background-position: 16px 10px;
+	height: 80px;
+	/* Pushes DF logo to right side */
+	text-align: right;
+	padding: 10px 16px 10px 16px;	
+	background-color: #000000;
+	border-bottom: 2px solid #CF3400;
+}
+
+/* Whole page goes in here */
+#container
+{
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	background-color: #111111;
+	overflow-y: hidden;
+}
+	
+/* Banish footer bar to bottom of container object */
+#container div.footer
+{
+	position: absolute;
+	bottom: 0;
+	height: 20px;
+	width: 100%;
+	background-color: #000000;
+	border-top: 1px solid #CF3400;
+}
+
+/* Page content goes here */
+#content
+{
+	height: 75%;
+	margin: 10px;
+	font-size: 18px;
+	background-color: #333333;
+	border: 1px solid #3F3F3F;
+	padding: 10px;
+	/* This might not be standard compliant */
+	overflow-x: hidden;
+	overflow-y: auto;
+}
+
+/* Keeps sidebar objects in their own area */
+#sidebar
+{
+	float: left;
+}
+	
+/* Generic sidebar container */
+#sideobject
+{
+	/* Set margin against content here, makes Opera happy */
+	margin: 10px;
+	width: 200px;
+}
+
+#sidebox
+{
+	background-color: #333333;
+	border: 1px solid #3F3F3F;
+}
+
+#sidecontent
+{
+	margin: 2px;
+	padding: 5px 5px 0px 5px;
+	font-size: 10px;
+}
+
+/* Generic sidebar box header */	 
+#boxheader
+{
+	height: 30px;
+	width: 198px;
+	line-height: 30px;
+	font-weight: bold;
+	font-size: 16px;
+	text-align: center;
+	background-color: #2B2B2B;
+	border: 1px solid #3F3F3F;
+}
+	
+/* Misc */
+
+.center {display: block; text-align:center; margin: 0 auto;}
+
+.sideitem {text-align:center; margin-bottom:5px; font-size:13px;}
+
+/* EOF */

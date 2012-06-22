@@ -1,0 +1,41 @@
+================================================================================
+=                            Bluelog On BackTrack                              =
+================================================================================
+
+If you're running Bluelog on a recent release of BackTrack Linux, there are a
+few extra steps you'll need to perform to run Bluelog Live due to the way
+BackTrack packages applications.
+
+--------------------------------------------------------------------------------
+- Installing Bluelog Live                                                      -
+--------------------------------------------------------------------------------
+
+BackTrack puts many of its included tools in the /pentest directory rather
+than actually installing them to the system, which means you can't use Bluelog
+outside of that directory, and the Bluelog Live files don't get installed to
+their appropriate location.
+
+The remedy to this problem is to simply run:
+
+$ make clean && make install
+
+Which will recompile Bluelog and install it system-wide. If you want to then
+move on to using Bluelog Live, read the "README.LIVE" file for instructions on
+setting up your HTTP daemon of choice.
+
+--------------------------------------------------------------------------------
+- BackTrack CSS Theme                                                          -
+--------------------------------------------------------------------------------
+
+To enable the BackTrack theme for Bluelog Live, find the following line in
+"Makefile":
+
+DEFAULT_CSS = digifail.css
+
+Then change it to:
+
+DEFAULT_CSS = backtrack.css
+
+Keep in mind that there is no functional difference between the two, it is just
+a cosmetic change.
+

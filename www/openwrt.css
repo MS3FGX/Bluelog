@@ -1,0 +1,120 @@
+/* OpenWRT theme for Bluelog Live */
+html, body
+{
+	margin: 0; 
+	padding: 0;
+	height: 100%;
+	background-color: #33333F;
+	color: #000000;
+	font-family: arial, sans-serif;
+	font-size: 12px;
+	overflow: hidden;
+}
+
+/* Used for footer link */
+h4, h4 a
+{
+	position: relative;
+	text-align: right;
+	margin-top: 4px;
+	right: 2px;
+	color: #1D6FCF;
+	font-size: 10px;
+}
+
+#header
+{
+	/* Logo, can change in CSS without touching HTML */
+	background-image: url('images/openwrt_logo.png');
+	background-repeat: no-repeat;
+	background-position: 0px 0px;
+	height: 76px;
+	/* Pushes DF logo to right side */
+	text-align: right;
+	padding: 10px 16px 10px 16px;	
+	background-color: #54778b;
+	border-bottom: 21px solid #000000;
+}
+
+/* Whole page goes in here */
+#container
+{
+	width: 100%;
+	height: 100%;
+	background-color: #557788;
+	overflow-y: hidden;
+}
+	
+/* Banish footer bar to bottom of container object */
+#container div.footer
+{
+	position: absolute;
+	bottom: 0;
+	height: 20px;
+	width: 100%;
+	background-color: #000000;
+}
+
+/* Page content goes here */
+#content
+{
+	height: 75%;
+	margin: 10px;
+	font-size: 18px;
+	background-color: #ccd6db;
+	border: 1px solid #787878;
+	padding: 10px;
+	/* This might not be standard compliant */
+	overflow-x: hidden;
+	overflow-y: auto;
+}
+
+/* Keeps sidebar objects in their own area */
+#sidebar
+{
+	float: left;
+}
+	
+/* Generic sidebar container */
+#sideobject
+{
+	/* Set margin against content here, makes Opera happy */
+	margin: 10px;
+	width: 200px;
+}
+
+#sidebox
+{
+	background-color: #ccd6db;
+	border: 3px solid #000000;
+}
+
+#sidecontent
+{
+	margin: 2px;
+	padding: 5px 5px 0px 5px;
+	font-size: 10px;
+}
+
+/* Generic sidebar box header */	 
+#boxheader
+{
+	height: 21px;
+	width: 200px;
+	line-height: 30px;
+	color: #FFFFFF;
+	font-family: arial, sans-serif;
+	font-weight: bold;
+	font-size: 18px;
+	text-align: center;
+	background-color: #000000;
+	padding-bottom: 2px;
+}
+
+/* Misc */
+
+.center {display: block; text-align:center; margin: 0 auto;}
+
+.sideitem {text-align:center;margin-bottom:5px; font-size:13px; color: #0000ee;}
+
+/* EOF */

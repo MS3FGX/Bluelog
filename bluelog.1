@@ -1,0 +1,167 @@
+.\" Bluelog MAN page, based on iwconfig.8
+.TH BLUELOG 1 "05/03/2012" "Bluelog" "Bluelog Manual"
+.\" NAME
+.SH NAME
+Bluelog \- Bluetooth Scanner and Logger 
+.\" SYNOPSIS
+.SH SYNOPSIS
+.BI "bluelog -i [Interface] [Options] -o [Output File]"
+.br
+.BI "bluelog -help"
+.\" DESCRIPTION 
+.SH DESCRIPTION
+Bluelog is a simple Bluetooth scanner that is designed to essentially do just
+one thing, log all the discoverable devices in the area. It is intended to be
+used as a site survey tool, identifying the number of possible Bluetooth targets
+there are in the surrounding environment.
+.PP
+I wrote Bluelog because there didn't appear to be any Bluetooth scanner for
+Linux that would simply log discoverable devices without also doing a whole
+bunch of other stuff I didn't really need.
+.PP
+Of course, in the end I managed to expand Bluelog into doing a whole bunch of
+other stuff I didn't really need. But at least I still kept it optional, so you
+can always stick with the basics if that is all you want.
+.\" PARAMETERS
+.SH PARAMETERS
+.TP
+.B -i <hci interface or MAC>
+This option tells Bluelog which Bluetooth device you want to scan with.
+You can use either the HCI device name (like hci2) or the MAC of the local
+adapter. As a bonus, if you give a device which doesn't exist, Bluelog will
+fall back on autodetection to find a working device. 
+.TP
+.B -o <filename>
+This is the (optional) filename of the log file to write. The default
+filename has the format of "bluelog-YYYY-MM-DD-HHMM.log", located in the
+current directory.
+.TP
+.B -r <retries>
+This option sets how many attempts Bluelog should make to resolve a device
+name. For various reasons (poor link, busy device, etc, etc), devices won't
+always respond to a name request in a timely manner. This fills the logs or
+Live display with un-named devices which look, frankly, uncool. By default,
+Bluelog will make 3 attempts to resolve a device name, using this option you
+can set that count to either be lower (faster, but less accurate), or higher
+(slower, but possibly more accurate).
+.TP
+.B -a <minutes>
+This option enables "amnesia mode", which causes Bluelog to forget it has
+seen a particular device after a set amount of time, given here as minutes.
+When Bluelog encounters a device it has forgotten through this option, it
+will print it to the logs again as if it was the first time it has been
+seen, and the time found will be updated.
+.TP
+.B -b
+This option will set the log format so that the resulting data is suitable
+for upload to ronin's Bluetooth Profiling Project (BlueProPro). This overrides
+most other logging options, and disables Bluelog Live. For more information on
+this project, and the additional steps required to submit your data for inclusion,
+visit: www.hackfromacave.com
+.TP
+.B -c
+This option toggles writing the raw device class to the log file. Enabling this
+option disables the -f option. Default is disabled.
+.TP
+.B -d
+This option will daemonize Bluelog so that it runs in the background. You
+will still see the boilerplate and startup messages, but after that you will
+no longer see any info from Bluelog in the terminal. Instead, status messages
+and device discovery will be reported to syslog (in addition, of course, to
+Bluelog's log files or Bluelog Live).
+.TP
+.B -f
+This option takes the device class and interprets it into a more human friendly
+format. It will tell you what class the device is and also what it's core
+capabilities are. For example, the class 
+.B "0x7a020c"
+would appear as:
+.B "Smart Phone,(Net Capture Obex Audio Phone)"
+Enabling this option disables the -c option. Default is disabled.
+.TP
+.B -k
+When running an instance of Bluelog in daemon mode, the -k option can be
+used to kill it.
+.TP
+.B -l
+This option switches Bluelog over to Live mode, which uses an automatically
+updated web page to show results rather than the console and regular log files.
+See
+.B "BLUELOG LIVE"
+below for more details.
+.TP
+.B -n
+Use this option to toggle displaying device names for discovered devices.
+Finding the device name takes extra time during scanning, and occasionally
+fails. Therefore by not resolving device names, Bluelog can scan faster and
+more accurately. Default is disabled.
+.TP
+.B -s
+Use this option to toggle syslog only mode. This disables the standard log
+file and writes new devices to the system log file instead. Default is
+disabled.
+.TP
+.B -t
+Use this option to toggle displaying timestamps for both the start and end
+of the scan and each new device found in the log file. Default is disabled.
+.TP
+.B -v
+Use this option to toggle displaying found devices on the console. Verbose
+output will also contain device class information and timestamps. Default is
+disabled.
+.TP
+.B -x
+Use this option to toggle MAC address obfuscation. This allows you to
+release your log files without (completely) compromising the identity of the
+scanned devices. Default is disabled. 
+.\" BASIC SCANNING
+.SH BASIC SCANNING
+There isn't a whole lot to say about this one. Start up Bluelog with the
+appropriate options, and then just walk/drive around the area and see what you
+come up with.
+.PP
+For your first scan, try something simple like:
+.PP
+.BI "bluelog -vtn"
+.PP
+This will turn on verbose output, timestamps, and device names, and output
+to the default file "devices.log". There are a number of other options which
+you can use to customize the level of logging Bluelog will do, but most people
+will probably be happy with just the time, MAC, and device name.
+.\" BLUELOG LIVE
+.SH BLUELOG LIVE
+.B "Bluelog Live"
+is an alternate interface for Bluelog. Instead of outputting discovered devices
+to the console, or writing them to the sparse log file, Bluelog will create a
+web page with the results that you can serve up for anyone who cares to look.
+.PP
+For more information on Bluelog Live, please see the
+.B README.LIVE
+file.
+.\" DAEMON MODE
+.SH DAEMON MODE
+Running Bluelog with the -d option will start it in daemon mode, which puts it
+into the background. This mode is especially useful when running Bluelog Live.
+.PP
+Only one instance of Bluelog can run at a time, so if you attempt to start
+Bluelog (in either daemon or interactive mode) while it is already running in
+daemon mode, you will be prompted to kill the existing process. You can use the
+-k option to kill a running Bluelog process, or simply find the process with
+ps and kill it manually.
+.PP
+It is worth noting that enabling daemon mode also overrides some other options,
+such as verbose mode (since there is no terminal output once Bluelog goes into
+the background).
+.\" AUTHOR
+.SH AUTHOR
+Tom Nardi \- 
+.I MS3FGX@gmail.com
+.br
+.I www.digifail.com
+.\" FILES
+.SH FILES
+.I /var/lib/bluelog
+.br
+.I /tmp/devices.log
+.br
+.I /tmp/info.txt

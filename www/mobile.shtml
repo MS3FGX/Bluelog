@@ -1,0 +1,36 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+<title>Bluelog Live</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<link href="mobile.css" type="text/css" rel="stylesheet" />
+<link rel="icon" type="image/png" href="images/favicon.png" />
+<link rel="shortcut icon" href="images/favicon.png" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/> 
+<meta HTTP-EQUIV="refresh" CONTENT="20">
+</head>
+<body>
+<div id="header">
+<span style="float:left;position:relative;top:-5px;">
+<img style="height:30%" src="images/bluelog_logo.png" border="0">
+</span>
+<span style="position:relative;left:5px;top:5px;">
+<a href="http://www.digifail.com/" target="_blank" title="DigiFAIL"><img style="height:20%;" src="images/digifail_logo.png" border="0"></a></span>
+</div>
+<div id="content">
+Discovered Devices: <!--#exec cmd="cat /tmp/live.log | wc -l" --></div>
+</div>
+<div id="content">
+<table border="1" cellpadding="5" cellspacing="5" width="100%">
+<tr>
+<th>Time</th>
+<th>MAC</th>
+<th>Name</th>
+<th>Class</th>
+</tr>
+<!--#exec cmd="sed -n '1!G;h;$p' /tmp/live.log | awk -F "</td>" '{print $1"</td>"$2"</td>"$3"</td>"$4"</td></tr>"}' | cut -c -8,18-" -->
+</table>
+</div>
+</body>
+</html>

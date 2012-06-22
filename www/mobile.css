@@ -1,0 +1,33 @@
+/* Bluelog Live Mobile CSS */
+html, body
+{
+	margin: 0; 
+	padding: 0;
+	background-color: #33333F;
+	overflow: auto;
+}
+
+#header
+{
+	height: 20%;
+	/* Pushes DF logo to right side */
+	text-align: right;
+	padding: 15px;	
+	background-color: #182842;
+	border-bottom: 2px solid #FF9C27;
+}
+
+/* Page content goes here */
+#content
+{
+	margin: 5px;
+	color: #CDCFD5;
+	font-size: 10px;
+	background-color: #545454;
+	border: 1px solid #787878;
+	padding: 5px;
+	/* This might not be standard compliant */
+	overflow-x: hidden;
+	overflow-y: auto;
+}
+

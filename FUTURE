@@ -1,0 +1,140 @@
+================================================================================
+=                           The Future of Bluelog                              =
+================================================================================
+
+This file used to be called "TODO", but I thought that gave the impression of
+it being a list of things I intended to actually accomplish, which would have
+been overly generous to say the least. Instead, I have created this new "FUTURE"
+file to mention a few things that I have in mind for possible future development
+of Bluelog. Not all of these things will get done, and some things not listed
+here may very well become my obsession and get implemented before them. 
+
+If you have any thoughts or comments on these ideas, please let me know.
+
+--------------------------------------------------------------------------------
+- Manufacturer Listing                                                         -
+--------------------------------------------------------------------------------
+
+I have been thinking of adding the ability for Bluelog to identify what
+manufacturer built the discovered Bluetooth device via MAC OUI. Technically
+this is no problem, and I could probably replace the "Capability" field with
+"Manufacturer" if the user enabled manufacturer lookups with Bluelog Live.
+
+I have secured permission from Terence Stenvold to use the MAC OUI list from 
+haraldscan (http://code.google.com/p/haraldscan/), so all that's left now is
+actually implementing the function.
+
+--------------------------------------------------------------------------------
+- XML log files                                                                -
+--------------------------------------------------------------------------------
+
+I was playing around with the XML log files from Harald Scan and thought they
+were really nice. Seems like this would be a worthy addition to Bluelog.
+
+The default output would still be plain text, but a option could be given on
+the command line to kick output into XML mode.
+
+--------------------------------------------------------------------------------
+- Name Failure Timeout                                                         -
+--------------------------------------------------------------------------------
+
+A limitation of the current name resolution code is that, if a device moves out
+of range before Bluelog is able to successfully query it's name, the device is
+never logged to file. It is kept in the device cache, but the data is never
+reported to the user.
+
+During tests, I found that for every 300 devices that were logged, as many as
+100-150 were not logged due to name resolution failures. This is an
+unacceptable amount of lost data.
+
+For the future, I want to work on a routine in which the device cache will
+occasionally be pruned of devices which are lingering in the cache with
+incomplete data. These device entries will be forced to the log file,
+regardless of their state.
+
+In the meantime, the best way to be sure Bluelog is logging all discoverable
+devices is to simply not enable name resolution.
+
+--------------------------------------------------------------------------------
+- Configuration file                                                           -
+--------------------------------------------------------------------------------
+
+Since Bluelog now has a proper daemon mode, it stands to reason that we would
+have a configuration file under /etc like all the other big-boy programs do.
+
+I have considered this for awhile, and I am still on the fence about it.
+Frankly, I'm not sure there are even enough options for Bluelog to make it worth
+supporting yet. For now, this is not really a priority, we will see how much
+more complicated Bluelog manages to get.
+
+--------------------------------------------------------------------------------
+- GUI Launcher                                                                 -
+--------------------------------------------------------------------------------
+
+Bluelog will never become a GUI application, let's get that straight right off
+the bat. However, there is absolutely no reason I couldn't put together a simple
+GTK launcher that lets the user configure the arguments which will be passed to
+Bluelog. Something like the GUI launcher for nmap.
+
+Not only would this be a very simple addition that involves no changes to the
+actual Bluelog codebase; it would give me the opportunity to play with Linux GUI
+programming. From what I can tell, a GTK application like this shouldn't be that
+big of a deal to throw together, even for a beginner.
+
+This feature is pretty high on the list of priorities right now, as I think it
+offers the most functionality with the least amount of work out of all the other
+ideas I have.
+
+--------------------------------------------------------------------------------
+- Bluelog Live Updates                                                         -
+--------------------------------------------------------------------------------
+
+In the future, a more modern version of Bluelog Live should be made available.
+This build will make use of PHP and other "Web 2.0" technologies to deliver a
+more dynamic and interactive UI. The idea is to implement things like graphs
+and sorting to make data easier to manage.
+
+This would be a fundamental shift in design for Bluelog Live, as the current
+version is specifically designed to be non-interactive. The current Live
+interface will always remain an option for those who wish to run a
+"Wall of Sheep" style display, but the more modern web UI will be a welcome
+addition for those looking for more control over the results.
+
+Development for the new Bluelog Live interface has been rather rocky so far,
+with only a very simple test version being put together by another developer.
+If you are a PHP/CGI developer and are interested in putting something together
+for possible future inclusion, please contact me.
+
+--------------------------------------------------------------------------------
+- Notification Sounds                                                          -
+--------------------------------------------------------------------------------
+
+It might be nice to have Bluelog play a notification sound on new device
+detection. I have been playing around with this a bit and haven't really decided
+on an appropriate way to implement it yet. I don't really want to directly play
+audio in Bluelog as that will both complicate the code base and add a dependency
+to ALSA. Ideally, I would just call something like the ALSA "aplay" tool from
+Bluelog, but that introduces a number of other problems I need to give some
+thought to.
+
+This will probably be implemented in the relatively near future, I just need to
+work a few bugs out and figure out the best way to handle it.
+
+--------------------------------------------------------------------------------
+- GPS Support                                                                  -
+--------------------------------------------------------------------------------
+
+GPS support was one of the first things I figured I would add when developing
+Bluelog, yet here we are getting close to version 1.0 and I haven't even given
+it more than a few minutes thought. I think the issue is that my original intent
+for Bluelog was more of a roving Bluetooth scanner, but it has instead become
+more of a stationary tool (I.E. Bluelog Live).
+
+Since Bluelog is more at home sitting still connected up to a projector, the
+idea of it appending coordinates for each found device sounds considerably less
+interesting.
+
+On the other hand, working with GPSd seems pretty easy, and adding GPS support
+shouldn't take much effort at all. At this point, I consider GPS support on the
+far back burner, as it isn't something I think Bluelog really needs anymore, but
+it isn't something I might not change my mind on later.

@@ -1,0 +1,309 @@
+================================================================================
+=                  Bluelog - Bluetooth Scanner and Logger                      =
+=                       Tom Nardi (MS3FGX@gmail.com)                           =
+================================================================================
+
+Bluelog is a Bluetooth scanner designed to tell you how many discoverable
+devices there are in an area as quickly as possible. It is intended to be used
+as a site survey tool, identifying the number of possible Bluetooth targets
+there are in the surrounding environment.
+
+I wrote Bluelog because there didn't appear to be any Bluetooth scanner for
+Linux that would simply log discoverable devices without also doing a whole
+bunch of other stuff I didn't really need.
+
+Of course, in the end I managed to expand Bluelog into doing a whole bunch of
+other stuff I didn't really need. But at least I still kept it optional, so you
+can always stick with the basics if that's all you want.
+
+--------------------------------------------------------------------------------
+- Compatibility                                                                -
+--------------------------------------------------------------------------------
+
+Bluelog has been written with portability and efficiency in mind, so it's able
+to run on a number of systems and hardware platforms. Basically, as long as the
+device can run (and get results from) "hcitool scan", and you can compile
+software for it, there is a good chance Bluelog can run on it.
+
+In addition to running on all major Linux distributions, Bluelog has been used
+successfully on Chrome OS (running on the CR-48 netbook), the Pwnie Express Pwn
+Plug, and OpenWRT devices. Bluelog is architecture portable, and has been
+tested on x86, ARM, MIPS, and PowerPC processors.
+
+As of version 1.0.2, Bluelog is included in BackTrack Linux and the development
+version of OpenWRT. Build scripts for Bluelog are also available via the Arch
+Linux AUR community repository.
+
+--------------------------------------------------------------------------------
+- Linux Kernel 3.0.x Bug                                                       -
+--------------------------------------------------------------------------------
+
+Please note that there is a fatal bug in the Linux 3.0.x kernel series which
+completely breaks Bluetooth scanning. This bug effects ALL software which uses
+Bluetooth, not just scanners like Bluelog. It will even hinder normal usage of
+Bluetooth, since it's pretty hard to pair a new device to your computer if you
+can't even scan for one.
+
+If your distribution is running Linux 3.0.x (such as Ubuntu 11.10 or Mint 12),
+you'll need to upgrade to AT LEAST the 3.1 series to use Bluetooth properly.
+
+You can read more about this bug on the linux-kernel mailing list:
+
+http://marc.info/?l=linux-kernel&m=131629118406044
+
+--------------------------------------------------------------------------------
+- Requirements                                                                 -
+--------------------------------------------------------------------------------
+
+Bluelog's only software requirement is BlueZ, and naturally your system must
+have at least one Bluetooth adapter connected to it. Any Bluetooth adapter
+supported under Linux should work with Bluelog.
+
+On Debian based systems like Ubuntu, you may need to install the "dev" version
+of the BlueZ package, which will probably be called something like
+"libbluetooth-dev". Debian breaks up the libraries from the main packages, so
+simply having the BlueZ package installed won't be enough.
+
+--------------------------------------------------------------------------------
+- Installation                                                                 -
+--------------------------------------------------------------------------------
+
+To compile Bluelog, simply run the command "make" in this directory. If you get
+any message about missing libraries, use your distribution's package manager to
+install them. This will let you run Bluelog from the current directory for a
+quick test, but not install it to the system.
+
+To actually install Bluelog, use the command "make install". Since this will
+install Bluelog to the system directories, you will need to run this as root or
+through sudo.
+
+When and if you want to remove Bluelog, you would use the command "make
+uninstall". As with "install", this makes changes to the system directories and
+will therefore require root permissions.
+
+In addition, if you are upgrading from a previous version, there is also the
+command "make upgrade". This will remove any older versions of Bluelog, compile
+the new version, and finally install it to the system. As you might have
+guessed, this also requires root permissions.
+
+Finally, if you plan on using "Bluelog Live", check out the README.LIVE file
+for information on the extra steps required.
+
+--------------------------------------------------------------------------------
+- Usage                                                                        -
+--------------------------------------------------------------------------------
+
+As of the current version, Bluelog supports the following options:
+
+-i <hci interface or MAC>
+    This option tells Bluelog which Bluetooth device you want to scan with.
+You can use either the HCI device name (like hci2) or the MAC of the local
+adapter. As a bonus, if you give a device which doesn't exist, Bluelog will
+fall back on autodetection to find a working device. 
+
+-o <filename>
+    This is the (optional) filename of the log file to write. The default
+filename has the format of "bluelog-YYYY-MM-DD-HHMM.log", located in the
+current directory.
+
+-r <retries>
+   This option sets how many attempts Bluelog should make to resolve a device
+name. For various reasons (poor link, busy device, etc, etc), devices won't
+always respond to a name request in a timely manner. This fills the logs or
+Live display with un-named devices which look, frankly, uncool. By default,
+Bluelog will make 3 attempts to resolve a device name, using this option you
+can set that count to either be lower (faster, but less accurate), or higher
+(slower, but possibly more accurate).
+
+-a <minutes>
+   This option enables "amnesia mode", which causes Bluelog to forget it has
+seen a particular device after a set amount of time, given here as minutes.
+When Bluelog encounters a device it has forgotten through this option, it
+will print it to the logs again as if it was the first time it has been
+seen, and the time found will be updated.
+
+-b
+   This option will set the log format so that the resulting data is suitable
+for upload to ronin's Bluetooth Profiling Project (BlueProPro). This overrides
+most other logging options and disables Bluelog Live. For more information on
+this project, and the additional steps required to submit your data for
+inclusion, visit: www.hackfromacave.com
+
+-c
+   This option toggles writing the raw device class to the log file. Enabling
+this option disables the -f option. Default is disabled.
+
+-d
+   This option will daemonize Bluelog so that it runs in the background. You
+will still see the boilerplate and startup messages, but after that you will
+no longer see any info from Bluelog in the terminal. Instead, status messages
+and device discovery will be reported to syslog (in addition to Bluelog's log
+files or Bluelog Live).
+
+-f
+   This option takes the device class and interprets it into a more human
+friendly format. It will tell you what class the device is and also what it's
+core capabilities are. For example, the class "0x7a020c" would appear as:
+"Smart Phone,(Net Capture Obex Audio Phone)". Enabling this option disables the
+-c option. Default is disabled.
+
+-k
+   When running an instance of Bluelog in daemon mode, the -k option can be
+used to kill it.
+
+-l
+   This option switches Bluelog over to Live mode, which uses an automatically
+updated web page to show results rather than the console and regular log files.
+See README.LIVE for more details.
+
+-n
+    Use this option to toggle displaying device names for discovered devices.
+Finding the device name takes extra time during scanning, and occasionally
+fails. Therefore by not resolving device names, Bluelog can scan faster and
+more accurately. Default is disabled.
+
+-s
+    Use this option to toggle syslog only mode. In this mode Bluelog will not
+write its normal log file, and instead write only to the system log file
+(/var/log/syslog). This mode is especially useful when combined with a network
+aware syslog daemon, which can be used to add rudimentary central logging to
+multiple Bluelog nodes.
+
+All normal log options apply in syslog mode. Syslog mode cannot be combined
+with BlueProPro or Live modes. Default is disabled.
+
+-t
+    Use this option to toggle displaying timestamps for both the start and end
+of the scan and each new device found in the log file. Default is disabled.
+
+-v
+    Use this option to toggle displaying found devices on the console. Verbose
+output will also contain device class information and timestamps. Default is
+disabled.
+
+-x
+   Use this option to toggle MAC address obfuscation. This allows you to
+release your log files without (completely) compromising the identity of the
+scanned devices. Default is disabled. 
+
+--------------------------------------------------------------------------------
+- Basic Scanning                                                               -
+--------------------------------------------------------------------------------
+
+There isn't a whole lot to say about this one. Start up Bluelog with the
+appropriate options, and then just walk/drive around the area and see what you
+come up with.
+
+For your first scan, try something simple like:
+
+$ bluelog -vtn
+
+This will turn on verbose output, timestamps, and device names, and output
+to the default log file. There are a number of other options which you can use
+to customize the level of logging Bluelog will do, but most people will
+probably be happy with just the time, MAC, and device name.
+
+--------------------------------------------------------------------------------
+- Bluelog Live                                                                 -
+--------------------------------------------------------------------------------
+
+"Bluelog Live" is an alternate interface for Bluelog. Instead of outputting
+discovered devices to the console, or writing them to the sparse log file,
+Bluelog will create a web page with the results that you can serve up for
+anyone who cares to look.
+
+For more information on Bluelog Live, please see the README.LIVE file.
+
+--------------------------------------------------------------------------------
+- Daemon Mode                                                                  -
+--------------------------------------------------------------------------------
+
+Running Bluelog with the -d option will start it in daemon mode, which puts it
+into the background. This mode is especially useful when running Bluelog Live.
+
+Only one instance of Bluelog can run at a time, so if you attempt to start
+Bluelog (in either daemon or interactive mode) while it is already running in
+daemon mode, you will be prompted to kill the existing process. You can use the
+-k option to kill a running Bluelog process, or simply find the process with
+ps and kill it manually.
+
+It is worth noting that enabling daemon mode also overrides some other options,
+such as verbose mode (since there is no terminal output once Bluelog goes into
+the background).
+
+--------------------------------------------------------------------------------
+- Packaging                                                                    -
+--------------------------------------------------------------------------------
+
+Bluelog's Makefile supports using environment variables to modify the
+installation so it can be more easily built into a binary package for your
+distribution. You can pass compiler options and the installation directory to
+the Makefile like so:
+
+$ make CFLAGS="-O2 -march=i486 -mtune=i686"
+gcc -O2 -march=i486 -mtune=i686 -lbluetooth bluelog.c -o bluelog
+$ mkdir ./pkg
+$ make install DESTDIR=./pkg
+mkdir -p ./pkg/usr/bin/
+mkdir -p ./pkg/usr/share/doc/bluelog-0.9.6/
+mkdir -p ./pkg/var/lib/bluelog/
+cp bluelog ./pkg/usr/bin/
+cp ChangeLog COPYING README TODO ./pkg/usr/share/doc/bluelog-0.9.6/
+cp -a --no-preserve=ownership www/* ./pkg/var/lib/bluelog/
+
+This allows you to easily script the build process and create a package using
+the package creation software for your distribution of choice.
+
+If you are able to build packages for your distribution, please let me know and
+we can work something out for hosting them on the site.
+
+--------------------------------------------------------------------------------
+- Acknowledgements                                                             -
+--------------------------------------------------------------------------------
+
+The initial code for Bluelog was based on sample code included in the book
+"Bluetooth Essentials for Programmers", by Albert Huang. This is a very
+informative book, and helps a lot if you are looking to get into BlueZ
+programming. It almost makes up for the terrible documentation from the BlueZ
+project.
+
+The website for this book is located at: http://www.btessentials.com/
+
+Bluelog also implements device class parsing code from "Inquisition", written
+by Michael John Wensley and released under the GPLv2.
+
+You can read more about "Inquisition" from his site: http://www.wensley.org.uk/
+
+The device cache rewrite took inspiration, if not literal code, from
+"SpoofTooph" by .ronin. You can check out "SpoofTooph" and .ronin's other
+projects on his site: http://www.hackfromacave.com/
+
+Bluelog also uses some code inspired by functions from pidfile.c by
+Martin Schulze.
+
+The OpenWRT version of Bluelog would not have been possible without the work
+of Gary Bonner and the logistical support of Joshua Hurst. The official
+Bluelog packages in the OpenWRT repositories are maintained by Stephen Walker.
+
+The continuing development of Bluelog was greatly assisted by the support of
+Dean Nielson.
+
+Finally, a special thanks to those who have donated Bluetooth devices to me for
+calibration purposes. Writing a Bluetooth scanner without any devices to scan
+is rather difficult, so the hardware has been very valuable to me.
+
+--------------------------------------------------------------------------------
+- License                                                                      -
+--------------------------------------------------------------------------------
+
+Bluelog is licensed under the GNU General Public License Version 2. You are
+free to use and distribute this program however you wish, so long as I am
+credited and any changes to the code are made public.
+
+For details, see the file "COPYING" in the source directory.
+
+--------------------------------------------------------------------------------
+- More Info                                                                    -
+--------------------------------------------------------------------------------
+
+For more information and updates, please see www.digifail.com

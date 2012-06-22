@@ -1,0 +1,383 @@
+06/18/12: Released as Version 1.0.4
+
+06/15/12:
+	Experimental: Adjust scan time based on platform.
+
+06/10/12:	
+	PWN/WRT: New error handler. Bluelog will accept up to 5 BlueZ errors.
+	CGI: Cleaned up Status pane
+	Updates to README.LIVE
+	Slight changes to class DB
+
+06/09/12:
+	CGI: New Status pane in Live view
+	Live: Theme cleanups
+
+06/07/12:
+	CGI: Allow version/debug before root user bail out
+	Removed README.WRT
+
+06/05/12:
+	Added "pwnplug" target to Makefile
+	CGI: Theme in-browser error messages
+	Live: Fix paths in about/contact
+	Live: "parse log file"? What was that supposed to mean?
+	Live: Bumped up about/contact font to 12pt
+
+06/01/12:
+	WRT: Only WRT theme included in bluelog-live, package shrunk by 24 KB
+
+05/29/12:
+	CGI: Added -h option, gives brief info
+	CGI: Added -v option, gives module version
+	CGI: Added -d option, gives debug into about module configuration
+
+05/21/12:
+	WRT: Fix CSS path in CGI
+
+05/21/12:
+	CGI: Refuse to run as root. Seems like a good idea.
+	CGI: Fixed cgi-bin path
+	Live: Removed unused image.
+
+05/18/12:
+	Removed start button from Perl and CGI UI, need to figure out fix
+
+05/16/12:
+	Initial version of livelog.cgi, a C CGI module for Bluelog Live
+	Largely re-written HTML to support CGI module, index.html
+	README.LIVE updated with livelog.cgi info
+	Added OpenWRT Bluelog Live theme (openwrt.css)
+
+05/15/12:
+	Updated livelog.pl, can now create full Live mode HTML
+	README.LIVE updated with livelog.pl info
+	Fixes to HTML headers in Live
+
+05/14/12: Released as Version 1.0.3
+	Switched from "tac" to "sed" in Bluelog Live, WRT compat improvement
+	livelog.pl updated, now creates complete Bluelog Live HTML page
+
+05/03/12:
+	New: Added -s option to log only to syslog (experimental)
+	New: Default filename is now "bluelog-YYYY-MM-DD-HHMM.log"
+	OUT_FILE configuration variable now OUT_PATH
+	Greatly reduced file I/O while logging
+	Items removed from FUTURE (Progress!)
+	Boilerplate cleanup on PWN/WRT
+	Updates to man page and docs
+
+05/02/12:
+	Code cleanups in theme CSS
+	PWN: Moved "devices.log" to /dev/shm on tmpfs
+
+04/26/12:
+	Initial support for Pwn Plug specific compile options (-PWN)
+
+04/22/12:
+	Removed unused code in Bluelog Live CSS
+	Initial version of Plug UI theme for Bluelog Live
+	Updated "Compatibility" section of README
+
+04/02/12:
+	Added "README.BAKTRK" for BT-specific instructions
+
+02/16/12:
+	Added VERSION modifier when built for OpenWRT
+
+02/11/12:
+	Updated Acknowledgements
+	Updated Makefile
+
+02/10/12: Released as version 1.0.2
+	OpenWRT build process streamlined for inclusion in official repos.
+	"openwrt" directory removed, docs moved to "README.WRT"
+	"config.h" files removed
+	New functions to change variables based on target platform
+	Doubled device cache on x86
+	Makefile updated
+	README updated
+	
+01/31/12: Released as version 1.0.1
+	Updated README about Linux 3.0.x bug
+	Added check in Bluelog to advise users about 3.0.x issue on failure
+
+01/02/12:
+	Changed Bluelog Live to take up whole page, maximizes visible space
+
+12/19/11: Released as version 1.0.0
+	More OpenWRT Makefile fixes
+	Fix help output when Bluelog Live is disabled
+	Documentation updated
+
+11/19/11:
+	Fixes to Bluelog Live mobile page SSI commands
+	Tweaks and cleanup to OpenWRT Makefiles
+
+11/13/11:
+	Initial version of Bluelog Live mobile page
+	README.LIVE updated
+
+11/07/11:
+	Updated and reordered FUTURE
+	Implemented fix for Ubuntu linker changes (Thanks Sepideh Aria)
+
+09/25/11:
+	OpenWRT specific config.h
+	Adjusted Makefile for OpenWRT
+	OpenWRT configuration complete
+
+09/12/11:
+	Pushed some build options into "config.h". Used mainly for OpenWRT.
+	Added ability to configure all default file locations
+	Changed default Bluelog Live file to "/tmp/live.log"
+	Fixed issues in Makefile
+
+08/08/11:
+	Progress on OpenWRT docs
+	OpenWRT specific Makefile
+
+08/02/11:
+	Many changes and fixes to Live UI
+	Refined ability to start Bluelog from Live UI
+	Added "About" link to Live UI
+	Added OpenWRT directory with Makefiles and docs
+	Removed "README.OTHEROS", merged into openwrt/README
+	Initial versions of OpenWRT Makefiles. Needs improvement.
+
+05/15/11: Released as version 0.9.9
+	Updates to "-h" output
+	Raised device cache limit to 2048
+	Added support for changing default output file at compile time
+
+05/05/11:
+	Fixed 200+ device glitch
+	Updated FUTURE
+
+04/30/11:
+	Updated README.LIVE
+	Updated FUTURE
+	Attempt to fix 200+ device glitch
+
+04/16/11:
+	Fixed slow memory leak over long term scans
+	Updated README.OTHEROS with tested OpenWRT devices
+	Slight style updates to README
+
+04/15/11:
+	Minor changes to FUTURE, had some new ideas.
+	Adjusted help screen to match Bluelog Live status
+	Added README.OTHEROS
+	Updated README
+
+04/09/11:
+	Added error handling for PID kill function
+	Added experimental support for starting Bluelog from Live interface
+	Added support for disabling Bluelog Live at compile time	
+
+04/02/11:
+	Greatly improved scan times with repeat devices
+	Fixed issue that prevented detecting new devices in some cases
+	Added status message during startup to indicate BlueProPro mode
+
+03/31/11:
+	Updated BlueProPro log format
+	Fixed bug with name resolution when using BlueProPro
+	Improved MAC obfuscation, only show OUI
+	Improved syslog entries for name retries
+
+03/08/11:
+	Rewrote Live HTML generator function to use new cache code
+
+03/05/11:
+	Updated README, added compatibility info
+	Updated FUTURE, added new ideas
+	Fixed massive bug effecting cache reset
+
+02/27/11:
+	Added "-a" option, allows Bluelog to "forget" devices
+	Improved error handling for command line options
+
+02/23/11:
+	Added "-n" option, name resolution now disabled by default
+	Updated README
+	Removed TODO (I thought I did this already...)
+	Added initial version of livelog.pl to /www
+	Added livelog.pl to README.LIVE
+
+01/23/11:
+	More cohesive error messages.
+	Added email address to help screen
+	Help screen fixes
+
+12/03/10:
+	Updated README.LIVE, Chrome works as of latest version
+	Log devices found with no name to syslog
+	Overwrite original discovery time on successful name retry
+
+12/01/10:
+	Moved all display functions to new cache code
+	Change class functions over to new cache code
+	Keep copy of un-obfuscated MAC for ID purposes
+	Implemented device re-scanning, needs testing
+	Fix problems with duplicate devices
+	Added function to clear cache, syslog notification
+	Made max device cache a DEFINE, default 512
+	Slight cleanup to device class strings
+
+11/30/10:
+	Total rewrite of device caching code. Possibly unstable.
+	Actually checked something off from FUTURE
+	Removed "-w" option, obsolete
+	Changed function of "-r" option, see README
+
+11/30/10: Released as version 0.9.8
+	Added "-b" option to enable BlueProPro log format
+	Updated documentation
+	New goals in FUTURE
+
+11/15/10:
+	Added "-f" option to log "friendly" class info
+	Changed order of log file, device name now always at the end of line
+	Updated documentation for new/changed options
+	Cleaned up "-h" output
+
+11/12/10:
+	Minor code cleanup
+	Only show human-readable class info in Bluelog Live, log raw value
+	Additional back-end info written to syslog
+	Minor changes to -h output
+
+10/29/10: Released as version 0.9.7
+	Renamed devclass.c to classes.c (has been bothering me for months)
+	TODO has become FUTURE, ideas for future Bluelog development
+	Changed PID file behavior. PID file now always created.
+	Put PID file creation into it's own function
+	More syslog entries
+
+10/16/10:
+	Documentation fixes and updates
+	Created MAN page
+	Updated Makefile
+
+10/12/10:
+	Override some incompatible options depending on mode
+	Updates and fixes to documentation
+	Broke Bluelog Live documentation into it's own file, README.LIVE
+	Fixed timestamp doubling in daemon mode
+	Added status dialog when switching into background
+
+10/11/10:
+	Changed "-d" option to "-i"
+	Added initial support for daemon mode
+	Added syslog support for daemon mode
+	Added additional signals to signal handler
+	Fixes to "Contact" page in Bluelog Live
+
+07/07/10: Released as version 0.9.6
+	Added "upgrade" target to Makefile
+	Added option in Makefile to set default CSS for Bluelog Live
+	Small fixes to Makefile
+	Updated documentation for installation and packaging
+	Fixed bug with discovered device SSI code
+	Reduced Bluelog Live refresh time to 20 seconds
+	Removed outdated comments in code
+
+07/06/10:
+	Only show scan start/end messages in log if timestamps are enabled
+	Live log no longer shows "Scan Ended" line, makes for cleaner output
+	Cleaned up format of Live log. Fewer lines, same great taste.
+	Faster SSI code for showing discovered device count in Bluelog Live
+	More efficient sanity checks for input variables
+	Removed "-s" option, really made no sense. Documentation updated.
+
+07/02/10:
+	Allow "retry" to be set to zero, disables name resolution
+	Changed default wait time between name attempts to 500 ms
+	Added "-w" option to set wait time between name attempts
+	Updated documentation for new options and name issue
+
+06/26/10:
+	Removed some old debug code
+	Initialize responses in devclass.c with memset
+	Small target fix in Makefile
+	Added function to retry failed name requests, controlled with "-r"
+
+06/25/10:
+	Improved Makefile dependencies for more reliable operation
+
+06/23/10:
+	Improved handling of VOID results for all fields in Bluelog Live
+	Improved display of capabilities string in verbose and plain text log
+
+06/21/10:
+	Improved handling of devices without names in Bluelog Live
+
+06/20/10: Released as version 0.9.5
+	Removed need for /tmp symlink in WWW directory
+	Improved handling for unknown devices
+	Updated documentation for Bluelog Live
+	Added discovered device count to Bluelog Live
+	Fixed "Discovered Devices" SSI for Apache
+	Include BackTrack CSS theme for Bluelog Live
+	Tweaks to Bluelog Live "INFO" box
+
+06/19/10:
+	Fixed relative links in HTML/CSS
+	Fixed seg fault on fclose bug
+	Fixed MAC/time mixup in log file
+	Fixed bug where Live mode would append to old log file
+	Fixed unused directory being created by "make install"
+	Dropped version number from /var directory. Easier to manage/update.
+
+06/18/10: Released as version 0.9.4
+	Merged in Bluelog Live. Early version, but works
+	Added "-l" option to enable Blulog Live
+	Added install/uninstall targets to Makefile
+	Cleaned up time reporting
+	
+06/16/10: Released as version 0.9.3
+	Implemented dev_class code from "Inquisition" (See Credits in README)
+	Added "-c" option to show device class and capability
+	Many small interface changes
+	README updates
+
+06/14/10:
+	First version of proper, extensible, Makefile
+	Initial work on Bluelog Live WWW interface (not yet merged)
+
+06/13/10: Released as version 0.9.2
+	Slightly updated Makefile, now detects x86_64
+	Added newline on exit
+	Added option to obfuscate MACs, "-x"
+
+06/01/10:
+	Changed infinite loop to more traditional C form
+
+05/10/10: Released as version 0.9.1
+	Bug and documentation fixes.
+	Changed option for "scans" to "-s"
+	First test run in the wild. Successfully discovered ~110 devices.
+
+04/22/10:
+	Minor code and documentation changes to bring in line with other apps
+	Support specifying adapter to scan with, with autodetection fallback
+	Wrote README and TODO
+
+04/09/10:
+	Added timestamps
+	
+04/05/10:
+	Device cache resetting, scanning is now complete
+
+04/04/10:
+	Added signal handler
+	Added file flushing
+	Added argument for number of scans
+
+04/03/10:
+	Added device cache, now shows only unique devices
+	Added file output
+
+04/02/10: Project Start
+	First scans, write to console
