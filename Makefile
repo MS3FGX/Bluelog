@@ -38,7 +38,7 @@ livelog:
 
 # Build tarball
 release: clean
-	tar --exclude='.git' -C ../ -czvf /tmp/$(APPNAME)-$(VERSION).tar.gz $(APPNAME)-$(VERSION)
+	tar --exclude='.*' -C ../ -czvf /tmp/$(APPNAME)-$(VERSION).tar.gz $(APPNAME)-$(VERSION)
 
 # Clean for dist
 clean:
