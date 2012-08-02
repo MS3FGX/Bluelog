@@ -42,7 +42,7 @@ release: clean
 
 # Clean for dist
 clean:
-	rm -rf $(APPNAME) $(CGIPRE)* *.o *.txt *.log *.gz *.cgi
+	rm -rf $(APPNAME) $(CGIPRE)livelog.cgi *.o *.txt *.log *.gz *.cgi
 
 # Install to system
 install: bluelog livelog

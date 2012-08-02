@@ -1,5 +1,10 @@
+08/1/12:
+	Added mobile.html
+	Added mobile.cgi, lame hack to fix issue
+	CGI: Work on mobile support
+	Live: Theme font fixes
+
 07/24/12:
-	Added .gitignore to make www/cgi-bin get tracked
 	Modified Makefile to ignore all hidden files when building tarball
 
 06/22/12:

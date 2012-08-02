@@ -45,26 +45,39 @@ FILE *infofile;
 struct btdev dev_cache[MAXNUM];
 int device_index = 0;
 
-void PrintHeader(void)
+void PrintHeader(char *CSSFILE)
 {
 	// CGI header
 	puts("Content-type: text/html\n\n");
 	// Boilerplate
 	printf("<!--This file created with %s (v%s) by MS3FGX-->\n", APPNAME, VERSION);
 	// HTML head
-	printf("<html><head><link href=\"%sstyle.css\" type=\"text/css\" rel=\"stylesheet\" /></head><body>\n", CSSPREFIX);
+	printf("<html><head><link href=\"%s%s\" type=\"text/css\" rel=\"stylesheet\" /></head><body>\n", CSSPREFIX,CSSFILE);
 }
-void SetupTable(void)
+void SetupTable(int mobile)
 {
 	// Table setup
 	puts("<table border=\"1\" cellpadding=\"5\" cellspacing=\"5\" width=\"100%\">\n");
-	puts("<tr>\n"\
-	"<th>Time Discovered</th>\n"\
-	"<th>MAC Address</th>\n"\
-	"<th>Device Name</th>\n"\
-	"<th>Device Class</th>\n"\
-	"<th>Capabilities</th>\n"\
-	"</tr>\n");
+	
+	if (!mobile)
+	{
+		puts("<tr>\n"\
+		"<th>Time Discovered</th>\n"\
+		"<th>MAC Address</th>\n"\
+		"<th>Device Name</th>\n"\
+		"<th>Device Class</th>\n"\
+		"<th>Capabilities</th>\n"\
+		"</tr>\n");
+	}
+	else
+	{
+		puts("<tr>\n"\
+		"<th>Time</th>\n"\
+		"<th>MAC</th>\n"\
+		"<th>Name</th>\n"\
+		"<th>Class</th>\n"\
+		"</tr>\n");
+	}
 }
 
 void PrintInfo(void)
@@ -113,6 +126,15 @@ int ReadPID (void)
 	return pid;
 }
 
+void TopBar (void)
+{
+	// Discovered devices display
+	puts("<div id=\"content\">\n");
+	printf("Discovered Devices: %i</div>\n",device_index);
+	// Close up info pane
+	puts("</div>\n");	
+}
+
 void SideBar(void)
 {	
 	// Start sidebar, Info pane
@@ -123,7 +145,6 @@ void SideBar(void)
 	"<div id=\"sidecontent\">");
 	
 	// Populate sidebar from files
-	ReadResults();
 	PrintInfo();
 	
 	// Close up info pane
@@ -175,9 +196,10 @@ static void help(void)
 	printf("For more information, see www.digifail.com\n");
 	printf("\n");
 	printf("Options:\n"
-		"\t-h              Display help.\n"
-		"\t-d              Print Debug Info.\n"
-		"\t-v              Print Version Info.\n"		
+		"\t-m              Mobile format\n"
+		"\t-h              Display help\n"
+		"\t-d              Print Debug Info\n"
+		"\t-v              Print Version Info\n"		
 		"\n");
 }
 
@@ -200,14 +222,20 @@ static struct option main_options[] = {
 	{ "help", 0, 0, 'h' },
 	{ "debug", 0, 0, 'd' },
 	{ "version", 0, 0, 'v' },
+	{ "mobile", 0, 0, 'm' },
 	{ 0, 0, 0, 0 }
 };
  
 int main(int argc, char *argv[])
 {		
+	// Variables	
+	// Default CSS
+	char CSSFILE[12]="style.css";
+
 	// Handle arguments
 	int opt;
-	while ((opt=getopt_long(argc, argv, "dvh", main_options, NULL)) != EOF)
+	int mobile = 0;
+	while ((opt=getopt_long(argc, argv, "dvhm", main_options, NULL)) != EOF)
 	{
 		switch (opt)
 		{
@@ -221,11 +249,15 @@ int main(int argc, char *argv[])
 			printf("%s (v%s) by MS3FGX\n", APPNAME, VERSION);
 			exit(0);
 			break;
+		case 'm':
+			strcpy(CSSFILE, "mobile.css");
+			mobile = 1;
+			break;
 		default:
 			printf("Unknown option.\n");
 			exit(0);
 		}
-	}	
+	}
 	
 	// Bail out if we are root, except on WRT
 	#ifndef OPENWRT
@@ -243,10 +275,11 @@ int main(int argc, char *argv[])
 	char *logfilename = LOG;
 	
 	// File header
-	PrintHeader();
+	PrintHeader(CSSFILE);
 	
 	// Start container div
-	puts("<div id=\"container\">\n");
+	if (!mobile)
+		puts("<div id=\"container\">\n");
 
 	// Open files
 	if ((infofile = fopen(infofilename, "r")) == NULL)
@@ -267,8 +300,12 @@ int main(int argc, char *argv[])
 		exit(1);
 	}
 	
-	// Draw sidebar
-	SideBar();
+	// Draw sidebar\topbar
+	ReadResults();
+	if (!mobile)
+		SideBar();
+	else
+		TopBar();
 	
 	// Content window
 	puts("<div id=\"content\">");
@@ -276,7 +313,7 @@ int main(int argc, char *argv[])
 	if (device_index > 0)
 	{
 		// Print results
-		SetupTable();
+		SetupTable(mobile);
 		PrintResults();
 		puts("</table>\n");
 	}
