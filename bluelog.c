@@ -689,8 +689,8 @@ int main(int argc, char *argv[])
 			
 			// Ignore occasional errors on Pwn Plug and OpenWRT
 			#if !defined PWNPLUG || OPENWRT
-			syslog(LOG_ERR,"Received error from BlueZ!");
 			// All other platforms, print error and bail out
+			syslog(LOG_ERR,"Received error from BlueZ!");
 			printf("Scan failed!\n");
 			// Check for kernel 3.0.x
 			if (!strncmp("3.0.",sysinfo.release,4))
@@ -712,7 +712,11 @@ int main(int argc, char *argv[])
 			#else
 			// Exit on back to back errors
 			if (error_count > 5)
+			{
+				printf("Scan failed!\n");				
+				syslog(LOG_ERR,"BlueZ not responding, unrecoverable!");
 				shut_down(1);
+			}
 			
 			// Otherwise, throttle back a bit, might help
 			sleep(1);

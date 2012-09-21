@@ -1,4 +1,7 @@
-08/1/12:
+09/20/12:
+	Improved error message for BlueZ lockup
+
+08/01/12:
 	Added mobile.html
 	Added mobile.cgi, lame hack to fix issue
 	CGI: Work on mobile support
