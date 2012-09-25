@@ -296,9 +296,13 @@ is rather difficult, so the hardware has been very valuable to me.
 - License                                                                      -
 --------------------------------------------------------------------------------
 
-Bluelog is licensed under the GNU General Public License Version 2. You are
-free to use and distribute this program however you wish, so long as I am
-credited and any changes to the code are made public.
+This program is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License version 2 as published by the Free
+Software Foundation.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE.
 
 For details, see the file "COPYING" in the source directory.
 
