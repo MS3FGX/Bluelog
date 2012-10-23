@@ -276,7 +276,7 @@ char* namequery (const bdaddr_t *addr)
 
 static void help(void)
 {
-	printf("%s (v%s%s) by MS3FGX (MS3FGX@gmail.com)\n", APPNAME, VERSION, VER_MOD);
+	printf("%s (v%s%s) by Tom Nardi \"MS3FGX\" (MS3FGX@gmail.com)\n", APPNAME, VERSION, VER_MOD);
 	printf("----------------------------------------------------------------\n");
 	printf("Bluelog is a Bluetooth site survey tool, designed to tell you how\n"
 		"many discoverable devices there are in an area as quickly as possible.\n"
@@ -296,26 +296,31 @@ static void help(void)
 	
 	printf("For more information, see: www.digifail.com\n");
 	printf("\n");
-	printf("Options:\n"
-		"\t-i <interface>     Sets scanning device, default is hci0\n"
-		"\t-o <filename>      Sets output filename, default is devices.log\n"
-		"\t-r <retries>       Name resolution retries, default is 3\n"
-		"\t-a <minutes>       Amnesia, Bluelog will forget device after given time\n" 
-		"\t-b                 Enable BlueProPro log format, see README\n"
-		"\t-c                 Write device class to log, default is disabled\n"
-		"\t-d                 Daemonize\n"
-		"\t-f                 Use \"friendly\" device class, default is disabled\n"
-		"\t-k                 Kill an already running Bluelog process\n");
-	
+	printf("Basic Options:\n"
+		"\t-i <interface>     Sets scanning device, default is \"hci0\"\n"
+		"\t-o <filename>      Sets output filename, default is \"devices.log\"\n"
+		"\t-v                 Enables verbose output, default is disabled\n"		
+		"\t-d                 Enables daemon mode, Bluelog will run in background\n"
+		"\t-k                 Kill an already running Bluelog process\n");		
+		
 	// Only print this if Bluelog Live is enabled in build
 	if (LIVEMODE)
 		printf("\t-l                 Start \"Bluelog Live\", default is disabled\n");
 	
-	printf("\t-n                 Write device names to log, default is disabled\n"
-		"\t-s                 Syslog only mode, no log file. Default is disabled\n"
+	printf("\n");
+	printf("Logging Options:\n"		
+		"\t-n                 Write device names to log, default is disabled\n"
+		"\t-c                 Write device class to log, default is disabled\n"
+		"\t-f                 Use \"friendly\" device class, default is disabled\n"		
 		"\t-t                 Write timestamps to log, default is disabled\n"
-		"\t-v                 Enables verbose output, default is disabled\n"
-		"\t-x                 Obfuscate discovered MACs, default is disabled\n"
+		"\t-x                 Obfuscate discovered MACs, default is disabled\n"	
+		"\t-b                 Enable BlueProPro log format, see README\n");
+
+	printf("\n");
+	printf("Advanced Options:\n"			
+		"\t-r <retries>       Name resolution retries, default is 3\n"
+		"\t-a <minutes>       Amnesia, Bluelog will forget device after given time\n"
+		"\t-s                 Syslog only mode, no log file. Default is disabled\n"
 		"\n");
 }
 
