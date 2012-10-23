@@ -124,6 +124,8 @@ results on a large screen).
 - In-Browser Bluelog Control                                                   -
 --------------------------------------------------------------------------------
 
+NOTE: CURRENTLY SSI MODE ONLY
+
 As of version 0.9.9, Bluelog Live includes experimental support for starting a
 Bluelog instance in daemon mode. The current method for doing this is very
 simple: the web interface uses SSI to start Bluelog with the following command:
@@ -140,6 +142,8 @@ so there is no danger of accidentally starting a second Bluelog thread.
 --------------------------------------------------------------------------------
 - Bluelog Live Mobile Interface                                                -
 --------------------------------------------------------------------------------
+
+NOTE: CURRENTLY SSI MODE ONLY
 
 As of version 1.0.0, Bluelog Live includes an experimental mobile version of
 the web interface. This version can be accessed at:
