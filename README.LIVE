@@ -92,7 +92,7 @@ distribution prefers.
 --------------------------------------------------------------------------------
 
 Once you have your server setup, you need to manually create a link from
-/var/lib/bluelog to wherever you want to serve it out of. Perhaps something
+/usr/share/bluelog to wherever you want to serve it out of. Perhaps something
 like /var/www/htdocs/bluelog. I left this step out of the installation
 intentionally, as I didn't want to run the risk of clobbering anyone's existing
 website.
@@ -133,8 +133,8 @@ simple: the web interface uses SSI to start Bluelog with the following command:
 bluelog -ld
 
 This command can be modified in the control.shtml file located in the Bluelog
-Live webroot (by default: /var/lib/bluelog) if you want to customize Bluelog's
-output (such as enabling obfuscation).
+Live webroot (by default: /usr/share/bluelog) if you want to customize
+Bluelog's output (such as enabling obfuscation).
 
 The built-in PID checking in Bluelog will prevent starting duplicate instances,
 so there is no danger of accidentally starting a second Bluelog thread.
