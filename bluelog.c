@@ -330,6 +330,7 @@ static struct option main_options[] = {
 	{ "verbose", 0, 0, 'v' },
 	{ "retry", 1, 0, 'r' },
 	{ "amnesia", 1, 0, 'a' },
+	{ "window", 1, 0, 'w' },
 	{ "time", 0, 0, 't' },
 	{ "obfuscate", 0, 0, 'x' },
 	{ "class", 0, 0, 'c' },
@@ -398,7 +399,7 @@ int main(int argc, char *argv[])
 	int bluepropro = 0;
 	int getname = 0;
 	int amnesia = 0;
-	
+		
 	// Pointers to filenames
 	char *infofilename = LIVE_INF;
 	
@@ -426,7 +427,7 @@ int main(int argc, char *argv[])
 	struct utsname sysinfo;
 	uname(&sysinfo);
 	
-	while ((opt=getopt_long(argc,argv,"+o:i:r:a:vxcthldbfnks", main_options, NULL)) != EOF)
+	while ((opt=getopt_long(argc,argv,"+o:i:r:a:w:vxcthldbfnks", main_options, NULL)) != EOF)
 	{
 		switch (opt)
 		{
@@ -445,6 +446,9 @@ int main(int argc, char *argv[])
 		case 'a':
 			amnesia = atoi(optarg);
 			break;	
+		case 'w':
+			scan_time =  atoi(optarg);
+			break;
 		case 'c':
 			showclass = 1;
 			break;
