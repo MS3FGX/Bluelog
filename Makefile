@@ -57,6 +57,7 @@ install: bluelog livelog
 	cp -a --no-preserve=ownership www/* $(DESTDIR)/usr/share/$(APPNAME)/
 	cd $(DESTDIR)/usr/share/$(APPNAME)/ ; ln -sf $(DEFAULT_CSS) style.css
 	cp bluelog.debian-init /etc/init.d/bluelog
+	chmod 755 /etc/init.d/bluelog
 	update-rc.d bluelog defaults
 
 # Build for Pwn Plug
