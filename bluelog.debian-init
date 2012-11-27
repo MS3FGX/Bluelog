@@ -2,7 +2,7 @@
 # /etc/init.d/bluelog
 ### BEGIN INIT INFO
 # Provides:          bluelog
-# Required-Start:    $remote_fs $syslog $bluetoothd
+# Required-Start:    $remote_fs $syslog $bluetoothd bluetooth 
 # Required-Stop:     $remote_fs $syslog
 # Default-Start:     2 3 4 5
 # Default-Stop:      0 1 6
