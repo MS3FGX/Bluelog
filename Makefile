@@ -53,6 +53,8 @@ install: bluelog livelog
 	cp $(APPNAME).1.gz $(DESTDIR)/usr/share/man/man1/
 	cp -a --no-preserve=ownership www/* $(DESTDIR)/usr/share/$(APPNAME)/
 	cd $(DESTDIR)/usr/share/$(APPNAME)/ ; ln -sf $(DEFAULT_CSS) style.css
+	cp bluelog.debian-init /etc/init.d/bluelog
+	update-rc.d bluelog defaults
 
 # Install without Bluelog Live
 nolive: bluelog
