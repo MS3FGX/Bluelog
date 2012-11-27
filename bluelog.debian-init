@@ -8,7 +8,7 @@ touch /var/lock/bluelog
 case "$1" in
   start)
     echo "Starting bluelog "
-	bluelog -dt -o /tmp/bluelog.log
+	bluelog -dt -w 6 -o /data/bluelog.log
     ;;
   stop)
     echo "Stopping bluelog"
