@@ -21,13 +21,13 @@ case "$1" in
   start)
     	log_daemon_msg "Starting $DESC"
 	start-stop-daemon --start --exec $DAEMON -- -dqt -w 6 -o /data/bluelog.log
-	log_progress_msg "${DAEMON##*/}"
-	log_end_msg 0
+	#log_progress_msg "${DAEMON##*/}"
+	log_end_msg $?
     ;;
   stop)
     	log_daemon_msg "Stoppint $DESC"
 	start-stop-daemon --stop --exec $DAEMON
-	log_end_msg 0
+	log_end_msg $?
     ;;
   restart)
         $0 stop

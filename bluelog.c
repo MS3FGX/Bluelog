@@ -213,8 +213,6 @@ static void write_pid (pid_t pid)
 		printf("Writing PID file: %s...", PID_FILE);
 	if ((pid_file = fopen(PID_FILE,"w")) == NULL)
 	{
-		printf("\n");
-		printf("Error opening PID file!\n");
 		exit(1);
 	}
 	if (!quiet)	
@@ -613,8 +611,6 @@ int main(int argc, char *argv[])
 	if (device < 0 || bt_socket < 0)
 	{
 		// Failed to open device, that can't be good
-		printf("\n");
-		printf("Error initializing Bluetooth device!\n");
 		exit(1);
 	}
 	// If we get here the device should be online.
