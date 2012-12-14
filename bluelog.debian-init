@@ -1,5 +1,4 @@
 #! /bin/sh
-# /etc/init.d/bluelog
 ### BEGIN INIT INFO
 # Provides:          bluelog
 # Required-Start:    $remote_fs $syslog $bluetoothd bluetooth 
@@ -10,22 +9,35 @@
 # Description:       Log bluetooth devices
 ### END INIT INFO
 
+DESC=bluelog
+DAEMON=/usr/bin/bluelog
+
+. /lib/lsb/init-functions
 # Some things that run always
 touch /var/lock/bluelog
+t -f $DAEMON || exit 0
 
 case "$1" in
   start)
-    echo "Starting bluelog "
-	bluelog -dt -w 6 -o /data/bluelog.log
+    	log_daemon_msg "Starting $DESC"
+	start-stop-daemon --start --exec $DAEMON -- -dqt -w 6 -o /data/bluelog.log
+	log_progress_msg "${DAEMON##*/}"
+	log_end_msg 0
     ;;
   stop)
-    echo "Stopping bluelog"
-	killall bluelog	
+    	log_daemon_msg "Stoppint $DESC"
+	start-stop-daemon --stop --exec $DAEMON
+	log_end_msg 0
     ;;
+  restart)
+        $0 stop
+        sleep 1
+        $0 start
+  ;;
   *)
-    echo "Usage: /etc/init.d/bluelog {start|stop}"
-    exit 1
-    ;;
+	echo "Usage: /etc/init.d/bluelog {start|stop|restart}"
+	exit 1
+	;;
 esac
 
 exit 0
