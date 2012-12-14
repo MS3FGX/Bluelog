@@ -1,3 +1,7 @@
+12/13/12:
+	Makefile improvements, added "nolive" to install without Live Mode
+	Added -q option to suppress all terminal output
+
 11/13/12:
 	Changed install directory to /usr/share/bluelog on x86
 	Docs updated accordingly

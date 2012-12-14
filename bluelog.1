@@ -1,5 +1,5 @@
 .\" Bluelog MAN page, based on iwconfig.8
-.TH BLUELOG 1 "05/03/2012" "Bluelog" "Bluelog Manual"
+.TH BLUELOG 1 "12/13/2012" "Bluelog" "Bluelog Manual"
 .\" NAME
 .SH NAME
 Bluelog \- Bluetooth Scanner and Logger 
@@ -21,7 +21,7 @@ bunch of other stuff I didn't really need.
 .PP
 Of course, in the end I managed to expand Bluelog into doing a whole bunch of
 other stuff I didn't really need. But at least I still kept it optional, so you
-can always stick with the basics if that is all you want.
+can always stick with the basics if that's all you want.
 .\" PARAMETERS
 .SH PARAMETERS
 .TP
@@ -95,6 +95,13 @@ Use this option to toggle displaying device names for discovered devices.
 Finding the device name takes extra time during scanning, and occasionally
 fails. Therefore by not resolving device names, Bluelog can scan faster and
 more accurately. Default is disabled.
+.TP
+.B -q
+Turn off nonessential terminal output. In normal mode this means you will
+only see the start time of the scan and the message indicating proper
+shutdown. When used with daemon mode (-d), there will be no terminal output
+at all. The only exception to this option are critical errors, for obvious
+reasons.
 .TP
 .B -s
 Use this option to toggle syslog only mode. This disables the standard log

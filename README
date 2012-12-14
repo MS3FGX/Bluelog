@@ -162,6 +162,13 @@ Finding the device name takes extra time during scanning, and occasionally
 fails. Therefore by not resolving device names, Bluelog can scan faster and
 more accurately. Default is disabled.
 
+-q
+   Turn off nonessential terminal output. In normal mode this means you will
+only see the start time of the scan and the message indicating proper
+shutdown. When used with daemon mode (-d), there will be no terminal output
+at all. The only exception to this option are critical errors, for obvious
+reasons.
+
 -s
     Use this option to toggle syslog only mode. In this mode Bluelog will not
 write its normal log file, and instead write only to the system log file

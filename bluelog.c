@@ -34,7 +34,7 @@
 
 #include "classes.c"
 
-#define VERSION	"1.0.4"
+#define VERSION	"1.0.5-RC1"
 #define APPNAME "Bluelog"
 
 // Determine device-specific configs
@@ -94,7 +94,9 @@ FILE *infofile; // Status file
 inquiry_info *results; // BlueZ scan results struct
 int bt_socket; // HCI device
 int showtime = 0; // Show timestamps in log		
-int syslogonly = 0; // Log file enabled				
+int syslogonly = 0; // Log file enabled
+int quiet = 0; // Print output normally
+			
 struct btdev dev_cache[MAX_DEV]; // Init device cache
 
 char* get_localtime()
@@ -148,12 +150,11 @@ void shut_down(int sig)
 	free(results);
 	//free(dev_cache);
 	close(bt_socket);
-	printf("OK\n");
+	// Delete PID file
+	unlink(PID_FILE);
 	printf("Done!\n");
 	// Log shutdown to syslog
 	syslog(LOG_INFO, "Shutdown OK.");
-	// Delete PID file
-	unlink(PID_FILE);
 	exit(sig);
 }
 
@@ -208,14 +209,16 @@ static void write_pid (pid_t pid)
 	FILE *pid_file;
 	
 	// Open PID file
-	printf("Writing PID file: %s...", PID_FILE);
+	if (!quiet)
+		printf("Writing PID file: %s...", PID_FILE);
 	if ((pid_file = fopen(PID_FILE,"w")) == NULL)
 	{
 		printf("\n");
 		printf("Error opening PID file!\n");
 		exit(1);
 	}
-	printf("OK\n");
+	if (!quiet)	
+		printf("OK\n");
 	
 	// If open, write PID and close	
 	fprintf(pid_file,"%d\n", pid);
@@ -251,7 +254,8 @@ static void daemonize (void)
 	// Write PID file
 	write_pid(sid);
 	
-	printf("Going into background...\n");
+	if (!quiet)
+		printf("Going into background...\n");
 		
 	// Close file descriptors
 	close(STDIN_FILENO);
@@ -299,9 +303,10 @@ static void help(void)
 	printf("Basic Options:\n"
 		"\t-i <interface>     Sets scanning device, default is \"hci0\"\n"
 		"\t-o <filename>      Sets output filename, default is \"devices.log\"\n"
-		"\t-v                 Enables verbose output, default is disabled\n"		
+		"\t-v                 Verbose, prints discovered devices to the terminal\n"		
+		"\t-q                 Quiet, turns off nonessential terminal outout\n"
 		"\t-d                 Enables daemon mode, Bluelog will run in background\n"
-		"\t-k                 Kill an already running Bluelog process\n");		
+		"\t-k                 Kill an already running Bluelog process\n");
 		
 	// Only print this if Bluelog Live is enabled in build
 	if (LIVEMODE)
@@ -341,6 +346,7 @@ static struct option main_options[] = {
 	{ "help", 0, 0, 'h' },
 	{ "daemonize", 0, 0, 'd' },
 	{ "syslog", 0, 0, 's' },
+	{ "quiet", 0, 0, 'q' },	
 	{ 0, 0, 0, 0 }
 };
 
@@ -426,7 +432,7 @@ int main(int argc, char *argv[])
 	struct utsname sysinfo;
 	uname(&sysinfo);
 	
-	while ((opt=getopt_long(argc,argv,"+o:i:r:a:vxcthldbfnks", main_options, NULL)) != EOF)
+	while ((opt=getopt_long(argc,argv,"+o:i:r:a:vxcthldbfnksq", main_options, NULL)) != EOF)
 	{
 		switch (opt)
 		{
@@ -463,6 +469,9 @@ int main(int argc, char *argv[])
 		case 'x':
 			obfuscate = 1;
 			break;
+		case 'q':
+			quiet = 1;
+			break;			
 		case 'l':
 			if(!LIVEMODE)
 			{
@@ -567,18 +576,22 @@ int main(int argc, char *argv[])
 	}
 
 	// Boilerplate
-	printf("%s (v%s%s) by MS3FGX\n", APPNAME, VERSION, VER_MOD);
-	// That's right, this kind of thing bothers me. Problem?
-	#if defined OPENWRT || PWNPLUG
-		printf("----");
-	#endif
-	printf("---------------------------\n");
+	if (!quiet)
+	{
+		printf("%s (v%s%s) by MS3FGX\n", APPNAME, VERSION, VER_MOD);
+		// That's right, this kind of thing bothers me. Problem?
+		#if defined OPENWRT || PWNPLUG
+			printf("----");
+		#endif
+		printf("---------------------------\n");
+	}
 
 	// Init Hardware
 	ba2str(&bdaddr, addr);
 	if (!strcmp(addr, "00:00:00:00:00:00"))
 	{
-		printf("Autodetecting device...");
+		if (!quiet)
+			printf("Autodetecting device...");
 		device = hci_get_route(NULL);
 		// Put autodetected device MAC into addr
 		hci_devba(device, &bdaddr);
@@ -586,7 +599,8 @@ int main(int argc, char *argv[])
 	}
 	else
 	{
-		printf("Initializing device...");
+		if (!quiet)
+			printf("Initializing device...");
 		device = hci_devid(addr);
 	}
 	
@@ -600,12 +614,14 @@ int main(int argc, char *argv[])
 		exit(1);
 	}
 	// If we get here the device should be online.
-	printf("OK\n");
+	if (!quiet)
+		printf("OK\n");
 	
 	// Status message for BPP
-	if (bluepropro)
-		printf("Output formatted for BlueProPro.\n"
-				"More Info: www.hackfromacave.com\n");
+	if (!quiet)
+		if (bluepropro)
+			printf("Output formatted for BlueProPro.\n"
+				   "More Info: www.hackfromacave.com\n");
 	
 	// Open output file
 	if (!syslogonly)
@@ -615,31 +631,39 @@ int main(int argc, char *argv[])
 			// Change location of output file
 			outfilename = LIVE_OUT;
 			filemode = "w";
-			printf("Starting Bluelog Live...\n");
+			if (!quiet)
+				printf("Starting Bluelog Live...\n");
 		}
-		printf("Opening output file: %s...", outfilename);
+		if (!quiet)		
+			printf("Opening output file: %s...", outfilename);
 		if ((outfile = fopen(outfilename, filemode)) == NULL)
 		{
 			printf("\n");
 			printf("Error opening output file!\n");
 			exit(1);
 		}
-		printf("OK\n");
+		if (!quiet)
+			printf("OK\n");
 	}
 	else
-		printf("In syslog mode, log file disabled.\n");
+	{
+		if (!quiet)
+			printf("In syslog mode, log file disabled.\n");
+	}
 	
 	// Open status file
 	if (bluelive)
 	{
-		printf("Opening info file: %s...", infofilename);
+		if (!quiet)		
+			printf("Opening info file: %s...", infofilename);
 		if ((infofile = fopen(infofilename,"w")) == NULL)
 		{
 			printf("\n");
 			printf("Error opening info file!\n");
 			exit(1);
 		}
-		printf("OK\n");
+		if (!quiet)
+			printf("OK\n");
 	}
 	
 	// Write PID file
@@ -648,8 +672,10 @@ int main(int argc, char *argv[])
 	
 	// Get and print time to console and file
 	strcpy(cur_time, get_localtime());
+		
 	if (!daemon)
 		printf("Scan started at [%s] on %s.\n", cur_time, addr);
+	
 	if (showtime)
 	{
 		fprintf(outfile,"[%s] Scan started on %s\n", cur_time, addr);
@@ -675,7 +701,10 @@ int main(int argc, char *argv[])
 	if (daemon)
 		daemonize();
 	else
-		printf("Hit Ctrl+C to end scan.\n");
+	{
+		if (!quiet)
+			printf("Hit Ctrl+C to end scan.\n");
+	}
 		
 	// Start scan, be careful with this infinite loop...
 	for(;;)
