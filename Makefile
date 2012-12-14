@@ -1,6 +1,6 @@
 # App info
 APPNAME = bluelog
-VERSION = 1.0.4
+VERSION = 1.0.5
 
 # Bluelog-specific, select which CSS theme to use as default
 # Options: digifail.css, backtrack.css, pwnplug.css, openwrt.css
@@ -25,15 +25,12 @@ DOCS = ChangeLog COPYING README README.LIVE README.BAKTRK FUTURE
 CGIPRE = www/cgi-bin/
 
 # Targets
-# Build all
-all: bluelog livelog
-
 # Build Bluelog
-bluelog:
+bluelog: bluelog.c
 	$(CC) $(CFLAGS) bluelog.c $(LIBS) -o $(APPNAME)
 
 # Build CGI module
-livelog:
+livelog: livelog.c
 	$(CC) $(CFLAGS) livelog.c -o $(CGIPRE)livelog.cgi
 
 # Build tarball
@@ -56,6 +53,17 @@ install: bluelog livelog
 	cp $(APPNAME).1.gz $(DESTDIR)/usr/share/man/man1/
 	cp -a --no-preserve=ownership www/* $(DESTDIR)/usr/share/$(APPNAME)/
 	cd $(DESTDIR)/usr/share/$(APPNAME)/ ; ln -sf $(DEFAULT_CSS) style.css
+
+# Install without Bluelog Live
+nolive: bluelog
+	mkdir -p $(DESTDIR)/usr/bin/
+	mkdir -p $(DESTDIR)/usr/share/doc/$(APPNAME)-$(VERSION)/
+	mkdir -p $(DESTDIR)/usr/share/man/man1
+	mkdir -p $(DESTDIR)/usr/share/$(APPNAME)/
+	cp $(APPNAME) $(DESTDIR)/usr/bin/
+	cp -a $(DOCS) $(DESTDIR)/usr/share/doc/$(APPNAME)-$(VERSION)/
+	gzip -c $(APPNAME).1 >> $(APPNAME).1.gz
+	cp $(APPNAME).1.gz $(DESTDIR)/usr/share/man/man1/
 
 # Build for Pwn Plug
 pwnplug:
