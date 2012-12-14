@@ -15,7 +15,7 @@ DAEMON=/usr/bin/bluelog
 . /lib/lsb/init-functions
 # Some things that run always
 touch /var/lock/bluelog
-t -f $DAEMON || exit 0
+test -f $DAEMON || exit 0
 
 case "$1" in
   start)
