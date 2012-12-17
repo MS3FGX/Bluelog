@@ -887,8 +887,8 @@ int main(int argc, char *argv[])
 					
 					// Write to syslog if we are daemon
 					if (daemon);
-						if (!syslogonly)
-						syslog(LOG_INFO,"Found new device: %s",dev_cache[ri].addr);
+						if (syslogonly)
+							syslog(LOG_INFO,"Found new device: %s",dev_cache[ri].addr);
 					
 					// Print everything to console if verbose is on
 					if (verbose)
