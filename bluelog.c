@@ -885,11 +885,6 @@ int main(int argc, char *argv[])
 						memset(addr_buff, '\0', sizeof(addr_buff));
 					}
 					
-					// Write to syslog if we are daemon
-					if (daemon);
-						if (!syslogonly)
-						syslog(LOG_INFO,"Found new device: %s",dev_cache[ri].addr);
-					
 					// Print everything to console if verbose is on
 					if (verbose)
 						printf("[%s] %s,%s,0x%02x%02x%02x\n",\

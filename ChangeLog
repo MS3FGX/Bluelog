@@ -1,6 +1,10 @@
+12/17/12:
+	Only log device discovery to syslog if enabled with -s
+
 12/13/12:
 	Makefile improvements, added "nolive" to install without Live Mode
 	Added -q option to suppress all terminal output
+	Updated documentation
 
 11/13/12:
 	Changed install directory to /usr/share/bluelog on x86
