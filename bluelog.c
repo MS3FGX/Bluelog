@@ -42,7 +42,7 @@
 #ifdef OPENWRT
 #define VER_MOD "-WRT"
 // Maximum number of devices in cache
-#define MAX_DEV 2048
+#define MAX_DEV 200
 // Toggle Bluelog Live
 #define LIVEMODE 1
 // Default log
