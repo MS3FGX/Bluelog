@@ -16,7 +16,7 @@ CC = gcc
 CFLAGS += -Wall -O2 $(TARGET)
 
 # Libraries to link
-LIBS = -lbluetooth
+LIBS = -lbluetooth -lm
 
 # Files
 DOCS = ChangeLog COPYING README README.LIVE README.BAKTRK FUTURE

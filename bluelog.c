@@ -16,26 +16,31 @@
  *  For more information, see: www.digifail.com
  */
 
+#include <time.h>
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 #include <getopt.h>
 #include <signal.h>
-#include <time.h>
+#include <syslog.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/socket.h>
 #include <sys/utsname.h>
-#include <syslog.h>
 #include <bluetooth/bluetooth.h>
 #include <bluetooth/hci.h>
 #include <bluetooth/hci_lib.h>
 
 #include "classes.c"
 
-#define VERSION	"1.0.5-RC1"
+#define VERSION	"1.0.5-RC2"
 #define APPNAME "Bluelog"
+
+// Platform generic settings
+#define MAX_SCAN 30
+#define MIN_SCAN 3
 
 // Determine device-specific configs
 // OpenWRT specific
@@ -325,6 +330,7 @@ static void help(void)
 	printf("Advanced Options:\n"			
 		"\t-r <retries>       Name resolution retries, default is 3\n"
 		"\t-a <minutes>       Amnesia, Bluelog will forget device after given time\n"
+		"\t-w <seconds>       Scanning window in seconds, see README\n"		
 		"\t-s                 Syslog only mode, no log file. Default is disabled\n"
 		"\n");
 }
@@ -335,6 +341,7 @@ static struct option main_options[] = {
 	{ "verbose", 0, 0, 'v' },
 	{ "retry", 1, 0, 'r' },
 	{ "amnesia", 1, 0, 'a' },
+	{ "window", 1, 0, 'w' },	
 	{ "time", 0, 0, 't' },
 	{ "obfuscate", 0, 0, 'x' },
 	{ "class", 0, 0, 'c' },
@@ -363,14 +370,14 @@ int main(int argc, char *argv[])
 	bdaddr_t bdaddr;
 	bacpy(&bdaddr, BDADDR_ANY);
 	
-	// Time to scan. Scan time is roughly 1.28 seconds * scan_time
+	// Time to scan. Scan time is roughly 1.28 seconds * scan_window
 	// Originally this was always 8, now we adjust based on device:
 	#ifdef OPENWRT
-	int scan_time = 8;
+	int scan_window = 8;
 	#elif PWNPLUG
-	int scan_time = 5;
+	int scan_window = 5;
 	#else
-	int scan_time = 3;
+	int scan_window = 3;
 	#endif
 	
 	// Maximum number of devices per scan
@@ -432,7 +439,7 @@ int main(int argc, char *argv[])
 	struct utsname sysinfo;
 	uname(&sysinfo);
 	
-	while ((opt=getopt_long(argc,argv,"+o:i:r:a:vxcthldbfnksq", main_options, NULL)) != EOF)
+	while ((opt=getopt_long(argc,argv,"+o:i:r:a:w:vxcthldbfnksq", main_options, NULL)) != EOF)
 	{
 		switch (opt)
 		{
@@ -450,6 +457,9 @@ int main(int argc, char *argv[])
 			break;
 		case 'a':
 			amnesia = atoi(optarg);
+			break;	
+		case 'w':
+			scan_window = round((atoi(optarg) / 1.28));
 			break;	
 		case 'c':
 			showclass = 1;
@@ -535,6 +545,13 @@ int main(int argc, char *argv[])
 		printf("Error, arguments must be positive numbers!\n");
 		exit(1);
 	}
+	
+	// Make sure window is reasonable
+	if ( scan_window > MAX_SCAN || scan_window < MIN_SCAN )
+	{
+		printf("Scan window is out of range. See README.\n");
+		exit(1);
+	}	
 	
 	// Override some options that don't play nice with others
 	// If retry is set, assume names are on. Default retry value
@@ -711,7 +728,7 @@ int main(int argc, char *argv[])
 		results = (inquiry_info*)malloc(max_results * sizeof(inquiry_info));
 		
 		// Scan and return number of results
-		num_results = hci_inquiry(device, scan_time, max_results, NULL, &results, flags);
+		num_results = hci_inquiry(device, scan_window, max_results, NULL, &results, flags);
 		
 		// A negative number here means an error during scan
 		if(num_results < 0)

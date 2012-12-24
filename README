@@ -125,6 +125,16 @@ seen, and the time found will be updated.
 A value of 0 here will cause Bluelog to continuously record a device as
 fast as possible (actual speed depends on platform Bluelog is running on).
 
+-w <seconds>
+    This is an experimental option that allows adjusting how long Bluelog
+instructs BlueZ to scan for. Generally speaking, shorter scan times allow
+Bluelog to process the incoming data faster, but requires more processing
+power. Longer scan times should theoretically work better on lower end
+hardware.
+
+I would recommend not touching this setting unless you know what you're
+doing. The current accepted range is 4 to 30 seconds.
+
 -b
    This option will set the log format so that the resulting data is suitable
 for upload to ronin's Bluetooth Profiling Project (BlueProPro). This overrides
@@ -139,9 +149,7 @@ this option disables the -f option. Default is disabled.
 -d
    This option will daemonize Bluelog so that it runs in the background. You
 will still see the boilerplate and startup messages, but after that you will
-no longer see any info from Bluelog in the terminal. Instead, status messages
-and device discovery will be reported to syslog (in addition to Bluelog's log
-files or Bluelog Live).
+no longer see any info from Bluelog in the terminal.
 
 -f
    This option takes the device class and interprets it into a more human

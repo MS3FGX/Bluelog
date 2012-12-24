@@ -1,5 +1,7 @@
 12/17/12:
 	Only log device discovery to syslog if enabled with -s
+	Added -w option to adjust scan window
+	Reordered MAN page
 
 12/13/12:
 	Makefile improvements, added "nolive" to install without Live Mode
