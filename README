@@ -123,7 +123,7 @@ will print it to the logs again as if it was the first time it has been
 seen, and the time found will be updated.
 
 A value of 0 here will cause Bluelog to continuously record a device as
-fast as possible (roughly every 3 seconds).
+fast as possible (actual speed depends on platform Bluelog is running on).
 
 -b
    This option will set the log format so that the resulting data is suitable
