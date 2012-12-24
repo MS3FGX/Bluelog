@@ -50,7 +50,8 @@ This option enables "amnesia mode", which causes Bluelog to forget it has
 seen a particular device after a set amount of time, given here as minutes.
 When Bluelog encounters a device it has forgotten through this option, it
 will print it to the logs again as if it was the first time it has been
-seen, and the time found will be updated.
+seen. A value of zero will cause Bluelog to continuously log a device as
+quickly as possible (roughly every 3 seconds).
 .TP
 .B -b
 This option will set the log format so that the resulting data is suitable

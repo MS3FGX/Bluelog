@@ -403,7 +403,7 @@ int main(int argc, char *argv[])
 	int daemon = 0;
 	int bluepropro = 0;
 	int getname = 0;
-	int amnesia = 0;
+	int amnesia = -1;
 	
 	// Pointers to filenames
 	char *infofilename = LIVE_INF;
@@ -530,7 +530,7 @@ int main(int argc, char *argv[])
 	}
 	
 	// Sanity checks
-	if ((retry_count < 0) || (amnesia < 0))
+	if ((retry_count < 0) || ((amnesia < 0) && (amnesia != -1)))
 	{	
 		printf("Error, arguments must be positive numbers!\n");
 		exit(1);
@@ -701,10 +701,8 @@ int main(int argc, char *argv[])
 	if (daemon)
 		daemonize();
 	else
-	{
 		if (!quiet)
 			printf("Hit Ctrl+C to end scan.\n");
-	}
 		
 	// Start scan, be careful with this infinite loop...
 	for(;;)
@@ -811,7 +809,7 @@ int main(int argc, char *argv[])
 					}
 					
 					// Amnesia mode
-					if (amnesia > 0)
+					if (amnesia >= 0)
 					{
 						// Find current epoch time
 						epoch = time(NULL);
