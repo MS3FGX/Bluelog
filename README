@@ -122,6 +122,9 @@ When Bluelog encounters a device it has forgotten through this option, it
 will print it to the logs again as if it was the first time it has been
 seen, and the time found will be updated.
 
+A value of 0 here will cause Bluelog to continuously record a device as
+fast as possible (roughly every 3 seconds).
+
 -b
    This option will set the log format so that the resulting data is suitable
 for upload to ronin's Bluetooth Profiling Project (BlueProPro). This overrides
@@ -289,11 +292,15 @@ Bluelog also uses some code inspired by functions from pidfile.c by
 Martin Schulze.
 
 The OpenWRT version of Bluelog would not have been possible without the work
-of Gary Bonner and the logistical support of Joshua Hurst. The official
-Bluelog packages in the OpenWRT repositories are maintained by Stephen Walker.
+of Gary Bonner and the logistical support of Joshua Hurst and Dean Nielson.
+Thanks also to Stephen Walker, who maintains the official OpenWRT packages for
+Bluelog, and has been an invaluable source of information on the platform.
 
-The continuing development of Bluelog was greatly assisted by the support of
-Dean Nielson.
+Thanks to Dave Porcello, Jonathan Cran, and the entire Pwnie Express team for
+their support and assistance on the Pwn Plug optimized build of Bluelog.
+
+Thanks to all users who have taken the time to contact me with comments and
+suggestions about Bluelog, which keeps pushing me in the right direction.
 
 Finally, a special thanks to those who have donated Bluetooth devices to me for
 calibration purposes. Writing a Bluetooth scanner without any devices to scan
