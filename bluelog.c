@@ -35,7 +35,7 @@
 
 #include "classes.c"
 
-#define VERSION	"1.0.5-RC2"
+#define VERSION	"1.1.0"
 #define APPNAME "Bluelog"
 
 // Platform generic settings

@@ -304,8 +304,15 @@ of Gary Bonner and the logistical support of Joshua Hurst and Dean Nielson.
 Thanks also to Stephen Walker, who maintains the official OpenWRT packages for
 Bluelog, and has been an invaluable source of information on the platform.
 
+Thanks to Jonas "onny" Heinrich for maintaining the Arch Linux build script
+for Bluelog. Read about his projects at: http://www.project-insanity.org/
+
 Thanks to Dave Porcello, Jonathan Cran, and the entire Pwnie Express team for
 their support and assistance on the Pwn Plug optimized build of Bluelog.
+
+Thanks to Paolo Valleri and the Integreen project for patches to Bluelog
+developed during the construction of their traffic monitoring network for
+Bolzano, Italy. Project site: http://www.integreen-life.bz.it/
 
 Thanks to all users who have taken the time to contact me with comments and
 suggestions about Bluelog, which keeps pushing me in the right direction.

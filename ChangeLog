@@ -1,3 +1,7 @@
+12/25/12: Released as Version 1.1.0 (Come All Ye Faithful Edition)
+	Removed CGI mobile page, not ready for stable release
+	Updated README
+
 12/17/12:
 	Only log device discovery to syslog if enabled with -s
 	Added -w option to adjust scan window
