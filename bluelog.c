@@ -99,7 +99,6 @@ FILE *infofile; // Status file
 inquiry_info *results; // BlueZ scan results struct
 int bt_socket; // HCI device
 int showtime = 0; // Show timestamps in log		
-int syslogonly = 0; // Log file enabled
 int quiet = 0; // Print output normally
 			
 struct btdev dev_cache[MAX_DEV]; // Init device cache
@@ -149,11 +148,10 @@ void shut_down(int sig)
 		fprintf(outfile,"[%s] Scan ended.\n", get_localtime());
 	
 	// Don't try to close a file that doesn't exist, kernel gets mad
-	if (!syslogonly)
+	if (outfile != NULL)
 		fclose(outfile);
 	
 	free(results);
-	//free(dev_cache);
 	close(bt_socket);
 	// Delete PID file
 	unlink(PID_FILE);
@@ -411,6 +409,7 @@ int main(int argc, char *argv[])
 	int bluepropro = 0;
 	int getname = 0;
 	int amnesia = -1;
+	int syslogonly = 0;
 	
 	// Pointers to filenames
 	char *infofilename = LIVE_INF;
