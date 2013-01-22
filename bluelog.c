@@ -706,12 +706,13 @@ int main(int argc, char *argv[])
 			printf("Hit Ctrl+C to end scan.\n");
 	}
 		
-	// Start scan, be careful with this infinite loop...
+	// Init result struct
+	results = (inquiry_info*)malloc(max_results * sizeof(inquiry_info));
+
+	// Seamless loop
 	for(;;)
 	{
-		// Init result struct
-		results = (inquiry_info*)malloc(max_results * sizeof(inquiry_info));
-		
+		memset( results, '\0', max_results * sizeof(inquiry_info) ); 
 		// Scan and return number of results
 		num_results = hci_inquiry(device, scan_time, max_results, NULL, &results, flags);
 		
@@ -952,9 +953,9 @@ int main(int argc, char *argv[])
 			if (!syslogonly)
 				fflush(outfile);
 		}
-		// Clear out results buffer
-		free(results);
 	}
+	// Clear out results buffer
+	free(results);
 	// If we get here, shut down
 	shut_down(0);
 	// STFU
