@@ -35,7 +35,7 @@
 
 #include "classes.c"
 
-#define VERSION	"1.1.0"
+#define VERSION	"1.1.1-dev"
 #define APPNAME "Bluelog"
 
 // Platform generic settings
@@ -720,11 +720,14 @@ int main(int argc, char *argv[])
 		if (!quiet)
 			printf("Hit Ctrl+C to end scan.\n");
 		
+	// Init result struct
+	results = (inquiry_info*)malloc(max_results * sizeof(inquiry_info));	
+	
 	// Start scan, be careful with this infinite loop...
 	for(;;)
 	{
-		// Init result struct
-		results = (inquiry_info*)malloc(max_results * sizeof(inquiry_info));
+		// Flush results buffer
+		memset(results, '\0', max_results * sizeof(inquiry_info)); 
 		
 		// Scan and return number of results
 		num_results = hci_inquiry(device, scan_window, max_results, NULL, &results, flags);
@@ -961,8 +964,6 @@ int main(int argc, char *argv[])
 			if (!syslogonly)
 				fflush(outfile);
 		}
-		// Clear out results buffer
-		free(results);
 	}
 	// If we get here, shut down
 	shut_down(0);
