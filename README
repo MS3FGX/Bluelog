@@ -151,6 +151,13 @@ this option disables the -f option. Default is disabled.
 will still see the boilerplate and startup messages, but after that you will
 no longer see any info from Bluelog in the terminal.
 
+-e
+   Use this option to toggle CRC32 MAC address encoding. With this option
+enabled, the discovered MAC addresses will never be logged to disk, rather,
+each device will have a unique ID generated for it. This prevents privacy
+concerns during activities such as Bluetooth traffic monitoring. Default is
+disabled.
+
 -f
    This option takes the device class and interprets it into a more human
 friendly format. It will tell you what class the device is and also what it's
@@ -200,9 +207,9 @@ output will also contain device class information and timestamps. Default is
 disabled.
 
 -x
-   Use this option to toggle MAC address obfuscation. This allows you to
-release your log files without (completely) compromising the identity of the
-scanned devices. Default is disabled. 
+   Use this option to toggle MAC address obfuscation. With this option
+enabled, Bluelog will display the manufacturer portion of each discovered
+MAC, but block out the device specific identifier. Default is disabled.
 
 --------------------------------------------------------------------------------
 - Basic Scanning                                                               -
@@ -216,7 +223,7 @@ For your first scan, try something simple like:
 
 $ bluelog -vtn
 
-This will turn on verbose output, timestamps, and device names, and output
+This will turn on verbose output, timestamps, device names, and output
 to the default log file. There are a number of other options which you can use
 to customize the level of logging Bluelog will do, but most people will
 probably be happy with just the time, MAC, and device name.

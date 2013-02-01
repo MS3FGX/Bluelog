@@ -34,6 +34,7 @@
 #include <bluetooth/hci_lib.h>
 
 #include "classes.c"
+#include "crc.c"
 
 #define VERSION	"1.1.1-dev"
 #define APPNAME "Bluelog"
@@ -321,7 +322,8 @@ static void help(void)
 		"\t-c                 Write device class to log, default is disabled\n"
 		"\t-f                 Use \"friendly\" device class, default is disabled\n"		
 		"\t-t                 Write timestamps to log, default is disabled\n"
-		"\t-x                 Obfuscate discovered MACs, default is disabled\n"	
+		"\t-x                 Obfuscate discovered MACs, default is disabled\n"
+		"\t-e                 Encode discovered MACs with CRC32, default is disabled\n"
 		"\t-b                 Enable BlueProPro log format, see README\n");
 
 	printf("\n");
@@ -351,6 +353,7 @@ static struct option main_options[] = {
 	{ "help", 0, 0, 'h' },
 	{ "daemonize", 0, 0, 'd' },
 	{ "syslog", 0, 0, 's' },
+	{ "encode", 0, 0, 'e' },
 	{ "quiet", 0, 0, 'q' },	
 	{ 0, 0, 0, 0 }
 };
@@ -410,6 +413,7 @@ int main(int argc, char *argv[])
 	int getname = 0;
 	int amnesia = -1;
 	int syslogonly = 0;
+	int encode = 0;
 	
 	// Pointers to filenames
 	char *infofilename = LIVE_INF;
@@ -438,7 +442,7 @@ int main(int argc, char *argv[])
 	struct utsname sysinfo;
 	uname(&sysinfo);
 	
-	while ((opt=getopt_long(argc,argv,"+o:i:r:a:w:vxcthldbfnksq", main_options, NULL)) != EOF)
+	while ((opt=getopt_long(argc,argv,"+o:i:r:a:w:vxcthldbfenksq", main_options, NULL)) != EOF)
 	{
 		switch (opt)
 		{
@@ -463,6 +467,9 @@ int main(int argc, char *argv[])
 		case 'c':
 			showclass = 1;
 			break;
+		case 'e':
+			encode = 1;
+			break;			
 		case 'f':
 			friendlyclass = 1;
 			break;
@@ -590,6 +597,13 @@ int main(int argc, char *argv[])
 		bluelive = 0;
 		bluepropro = 0;
 	}
+	
+	// Encode trumps obfuscate
+	if (encode)
+		obfuscate = 0;
+	
+	// Setup CRC
+	init_crc();
 
 	// Boilerplate
 	if (!quiet)
@@ -887,19 +901,27 @@ int main(int argc, char *argv[])
 				// Ready to print?
 				if (dev_cache[ri].print == 1) 
 				{	
-					// Obfuscate MAC
-					if (obfuscate)
+					// Encode MAC
+					if (encode || obfuscate)
 					{
+						// Clear buffer
+						memset(addr_buff, '\0', sizeof(addr_buff));
+						
 						// Preserve real MAC
 						strcpy(dev_cache[ri].priv_addr, dev_cache[ri].addr);
 
-						// Split out OUI, replace device with XX
-						strncpy(addr_buff, dev_cache[ri].addr, 9);
-						strcat(addr_buff, "XX:XX:XX");
+						if (obfuscate)
+						{
+							// Split out OUI, replace device with XX
+							strncpy(addr_buff, dev_cache[ri].addr, 9);
+							strcat(addr_buff, "XX:XX:XX");
+						}
 						
-						// Copy to DB, clear buffer for next device
+						if (encode)
+							sprintf(addr_buff,"%.8X", crc_hash((unsigned char *)dev_cache[ri].addr, strlen(dev_cache[ri].addr)));
+
+						// Copy to cache
 						strcpy(dev_cache[ri].addr, addr_buff);
-						memset(addr_buff, '\0', sizeof(addr_buff));
 					}
 					
 					// Print everything to console if verbose is on

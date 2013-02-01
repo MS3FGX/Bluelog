@@ -1,5 +1,5 @@
 .\" Bluelog MAN page, based on iwconfig.8
-.TH BLUELOG 1 "12/23/2012" "Bluelog" "Bluelog Manual"
+.TH BLUELOG 1 "01/31/2013" "Bluelog" "Bluelog Manual"
 .\" NAME
 .SH NAME
 Bluelog \- Bluetooth Scanner and Logger 
@@ -90,9 +90,16 @@ Use this option to toggle displaying timestamps for both the start and end
 of the scan and each new device found in the log file. Default is disabled.
 .TP
 .B -x
-Use this option to toggle MAC address obfuscation. This allows you to
-release your log files without (completely) compromising the identity of the
-scanned devices. Default is disabled. 
+Use this option to toggle MAC address obfuscation. With this option
+enabled, Bluelog will display the manufacturer portion of each discovered
+MAC, but block out the device specific identifier. Default is disabled.
+.TP
+.B -e
+Use this option to toggle CRC32 MAC address encoding. With this option
+enabled, the discovered MAC addresses will never be logged to disk, rather,
+each device will have a unique ID generated for it. This prevents privacy
+concerns during activities such as Bluetooth traffic monitoring. Default is
+disabled.
 .TP
 .B -b
 This option will set the log format so that the resulting data is suitable
@@ -141,7 +148,7 @@ For your first scan, try something simple like:
 .PP
 .BI "bluelog -vtn"
 .PP
-This will turn on verbose output, timestamps, and device names, and output
+This will turn on verbose output, timestamps, device names, and output
 to the default file "devices.log". There are a number of other options which
 you can use to customize the level of logging Bluelog will do, but most people
 will probably be happy with just the time, MAC, and device name.

@@ -1,3 +1,8 @@
+01/31/13:
+	EXPERIMENTAL: Added -e option to encode MACs with CRC32
+	Updated MAN page
+	Updated README
+
 01/24/13:
 	Improved memory management, thanks Paolo
 
