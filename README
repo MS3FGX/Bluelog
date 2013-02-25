@@ -299,6 +299,11 @@ by Michael John Wensley and released under the GPLv2.
 
 You can read more about "Inquisition" from his site: http://www.wensley.org.uk/
 
+Bluelog implements a modified version of the CRC hashing functions from
+"CRC Tester" by Sven Reifegerste.
+
+Sven's page about CRC encoding: http://www.zorc.breitbandkatze.de/crc.html
+
 The device cache rewrite took inspiration, if not literal code, from
 "SpoofTooph" by .ronin. You can check out "SpoofTooph" and .ronin's other
 projects on his site: http://www.hackfromacave.com/
