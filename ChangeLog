@@ -1,3 +1,6 @@
+02/24/12:
+	Allow for friendly class names in verbose mode, thanks Dean
+
 01/31/13:
 	EXPERIMENTAL: Added -e option to encode MACs with CRC32
 	Updated MAN page

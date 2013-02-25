@@ -553,7 +553,7 @@ int main(int argc, char *argv[])
 	}
 	
 	// Make sure window is reasonable
-	if ( scan_window > MAX_SCAN || scan_window < MIN_SCAN )
+	if (scan_window > MAX_SCAN || scan_window < MIN_SCAN)
 	{
 		printf("Scan window is out of range. See README.\n");
 		exit(1);
@@ -924,12 +924,24 @@ int main(int argc, char *argv[])
 						strcpy(dev_cache[ri].addr, addr_buff);
 					}
 					
-					// Print everything to console if verbose is on
+					// Print everything to console if verbose is on, optionally friendly class info
 					if (verbose)
-						printf("[%s] %s,%s,0x%02x%02x%02x\n",\
-						dev_cache[ri].time, dev_cache[ri].addr,\
-						dev_cache[ri].name, dev_cache[ri].flags,\
-						dev_cache[ri].major_class, dev_cache[ri].minor_class);
+					{
+						if (friendlyclass)
+						{
+							printf("[%s] %s,%s,%s,(%s)\n",\
+								dev_cache[ri].time, dev_cache[ri].addr,\
+								dev_cache[ri].name, device_class(dev_cache[ri].major_class,\
+								dev_cache[ri].minor_class), device_capability(dev_cache[ri].flags));						
+						}
+						else
+						{
+							printf("[%s] %s,%s,0x%02x%02x%02x\n",\
+								dev_cache[ri].time, dev_cache[ri].addr,\
+								dev_cache[ri].name, dev_cache[ri].flags,\
+								dev_cache[ri].major_class, dev_cache[ri].minor_class);
+						}
+					}
 											
 					if (bluelive)
 					{
