@@ -33,51 +33,12 @@
 #include <bluetooth/hci.h>
 #include <bluetooth/hci_lib.h>
 
+// Load configuration
+#include "config.h"
+
+// Bluelog-specific includes
 #include "classes.c"
-#include "crc.c"
-
-#define VERSION	"1.1.1-dev"
-#define APPNAME "Bluelog"
-
-// Platform generic settings
-#define MAX_SCAN 30
-#define MIN_SCAN 3
-
-// Determine device-specific configs
-// OpenWRT specific
-#ifdef OPENWRT
-#define VER_MOD "-WRT"
-// Maximum number of devices in cache
-#define MAX_DEV 2048
-// Toggle Bluelog Live
-#define LIVEMODE 1
-// Default log
-#define OUT_PATH "/tmp/"
-// Bluelog Live device list
-#define LIVE_OUT "/tmp/live.log"
-// Bluelog Live status info
-#define LIVE_INF "/tmp/info.txt"
-// PID storage
-#define PID_FILE "/tmp/bluelog.pid"
-// PWNPLUG specific
-#elif PWNPLUG
-#define VER_MOD "-PWN"
-#define MAX_DEV 4096
-#define LIVEMODE 1
-#define OUT_PATH "/dev/shm/"
-#define LIVE_OUT "/tmp/live.log"
-#define LIVE_INF "/tmp/info.txt"
-#define PID_FILE "/tmp/bluelog.pid"
-#else
-// Generic x86
-#define VER_MOD ""
-#define MAX_DEV 4096
-#define LIVEMODE 1
-#define OUT_PATH ""
-#define LIVE_OUT "/tmp/live.log"
-#define LIVE_INF "/tmp/info.txt"
-#define PID_FILE "/tmp/bluelog.pid"
-#endif
+#include "libmackerel.c"
 
 // Found device struct
 struct btdev
@@ -318,12 +279,17 @@ static void help(void)
 	
 	printf("\n");
 	printf("Logging Options:\n"		
-		"\t-n                 Write device names to log, default is disabled\n"
-		"\t-c                 Write device class to log, default is disabled\n"
+		"\t-n                 Write device names to log, default is disabled\n");
+	
+	// Only print this if OUI lookup is enabled in build
+	if (OUILOOKUP)
+		printf("\t-m                 Write device manufacturer to log, default is disabled\n");
+
+	printf("\t-c                 Write device class to log, default is disabled\n"
 		"\t-f                 Use \"friendly\" device class, default is disabled\n"		
 		"\t-t                 Write timestamps to log, default is disabled\n"
 		"\t-x                 Obfuscate discovered MACs, default is disabled\n"
-		"\t-e                 Encode discovered MACs with CRC32, default is disabled\n"
+		"\t-e                 Encode discovered MACs with CRC32, default disabled\n"
 		"\t-b                 Enable BlueProPro log format, see README\n");
 
 	printf("\n");
@@ -354,7 +320,8 @@ static struct option main_options[] = {
 	{ "daemonize", 0, 0, 'd' },
 	{ "syslog", 0, 0, 's' },
 	{ "encode", 0, 0, 'e' },
-	{ "quiet", 0, 0, 'q' },	
+	{ "quiet", 0, 0, 'q' },
+	{ "manufacturer", 0, 0, 'm' },
 	{ 0, 0, 0, 0 }
 };
 
@@ -414,6 +381,7 @@ int main(int argc, char *argv[])
 	int amnesia = -1;
 	int syslogonly = 0;
 	int encode = 0;
+	int getmanufacturer = 0;
 	
 	// Pointers to filenames
 	char *infofilename = LIVE_INF;
@@ -442,7 +410,7 @@ int main(int argc, char *argv[])
 	struct utsname sysinfo;
 	uname(&sysinfo);
 	
-	while ((opt=getopt_long(argc,argv,"+o:i:r:a:w:vxcthldbfenksq", main_options, NULL)) != EOF)
+	while ((opt=getopt_long(argc,argv,"+o:i:r:a:w:vxcthldbfenksmq", main_options, NULL)) != EOF)
 	{
 		switch (opt)
 		{
@@ -505,6 +473,15 @@ int main(int argc, char *argv[])
 			break;
 		case 'n':
 			getname = 1;
+			break;
+		case 'm':
+			if(!OUILOOKUP)
+			{
+				printf("Manufacturer lookups have been disabled in this build. See documentation.\n");
+				exit(0);
+			}
+			else
+				getmanufacturer = 1;
 			break;
 		case 'h':
 			help();
@@ -602,8 +579,8 @@ int main(int argc, char *argv[])
 	if (encode)
 		obfuscate = 0;
 	
-	// Setup CRC
-	init_crc();
+	// Setup libmackerel
+	mac_init();
 
 	// Boilerplate
 	if (!quiet)
@@ -911,14 +888,10 @@ int main(int argc, char *argv[])
 						strcpy(dev_cache[ri].priv_addr, dev_cache[ri].addr);
 
 						if (obfuscate)
-						{
-							// Split out OUI, replace device with XX
-							strncpy(addr_buff, dev_cache[ri].addr, 9);
-							strcat(addr_buff, "XX:XX:XX");
-						}
+							strcpy(addr_buff, mac_obfuscate(dev_cache[ri].addr));
 						
 						if (encode)
-							sprintf(addr_buff,"%.8X", crc_hash((unsigned char *)dev_cache[ri].addr, strlen(dev_cache[ri].addr)));
+							strcpy(addr_buff, mac_encode(dev_cache[ri].addr));
 
 						// Copy to cache
 						strcpy(dev_cache[ri].addr, addr_buff);
@@ -978,11 +951,15 @@ int main(int argc, char *argv[])
 							sprintf(outbuffer+strlen(outbuffer),",%s,(%s)",\
 							device_class(dev_cache[ri].major_class, dev_cache[ri].minor_class),\
 							device_capability(dev_cache[ri].flags));
+						
+						// Get manufacturer
+						if (getmanufacturer)
+							sprintf(outbuffer+strlen(outbuffer),",%s", mac_get_vendor(dev_cache[ri].addr));
 							
 						// Append the name
 						if (getname)
 							sprintf(outbuffer+strlen(outbuffer),",%s", dev_cache[ri].name);
-						
+													
 						// Send buffer, else file. File needs newline
 						if (syslogonly)
 							syslog(LOG_INFO,"%s", outbuffer);

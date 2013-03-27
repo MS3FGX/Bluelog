@@ -311,6 +311,9 @@ projects on his site: http://www.hackfromacave.com/
 Bluelog also uses some code inspired by functions from pidfile.c by
 Martin Schulze.
 
+The OUI database for manufacturer lookup is taken with permission from
+haraldscan by Terence Stenvold: http://code.google.com/p/haraldscan/
+
 The OpenWRT version of Bluelog would not have been possible without the work
 of Gary Bonner and the logistical support of Joshua Hurst and Dean Nielson.
 Thanks also to Stephen Walker, who maintains the official OpenWRT packages for

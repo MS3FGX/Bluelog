@@ -1,6 +1,6 @@
 # App info
 APPNAME = bluelog
-VERSION = 1.1.0
+VERSION = 1.1.1
 
 # Bluelog-specific, select which CSS theme to use as default
 # Options: digifail.css, backtrack.css, pwnplug.css, openwrt.css
@@ -51,6 +51,7 @@ install: bluelog livelog
 	cp -a $(DOCS) $(DESTDIR)/usr/share/doc/$(APPNAME)-$(VERSION)/
 	gzip -c $(APPNAME).1 >> $(APPNAME).1.gz
 	cp $(APPNAME).1.gz $(DESTDIR)/usr/share/man/man1/
+	cp MACLIST $(DESTDIR)/usr/share/$(APPNAME)/
 	cp -a --no-preserve=ownership www/* $(DESTDIR)/usr/share/$(APPNAME)/
 	cd $(DESTDIR)/usr/share/$(APPNAME)/ ; ln -sf $(DEFAULT_CSS) style.css
 

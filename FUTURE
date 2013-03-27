@@ -12,19 +12,6 @@ here may very well become my obsession and get implemented before them.
 If you have any thoughts or comments on these ideas, please let me know.
 
 --------------------------------------------------------------------------------
-- Manufacturer Listing                                                         -
---------------------------------------------------------------------------------
-
-I have been thinking of adding the ability for Bluelog to identify what
-manufacturer built the discovered Bluetooth device via MAC OUI. Technically
-this is no problem, and I could probably replace the "Capability" field with
-"Manufacturer" if the user enabled manufacturer lookups with Bluelog Live.
-
-I have secured permission from Terence Stenvold to use the MAC OUI list from 
-haraldscan (http://code.google.com/p/haraldscan/), so all that's left now is
-actually implementing the function.
-
---------------------------------------------------------------------------------
 - XML log files                                                                -
 --------------------------------------------------------------------------------
 

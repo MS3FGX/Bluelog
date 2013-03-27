@@ -1,4 +1,10 @@
-02/24/12:
+03/27/13:
+	Merged in libmackerel
+	Merged in MACLIST from haraldscan
+	Experimental manufacturer lookups (currently x86 only)
+	Configuration options broken out into config.h
+
+02/24/13:
 	Allow for friendly class names in verbose mode, thanks Dean
 
 01/31/13:
