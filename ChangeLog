@@ -1,3 +1,12 @@
+03/31/13:
+	Switched out Haraldscan MACLIST for IEEE list. So many bytes...
+
+03/30/13:
+	Added "standalone" target to Makefile, kind of hacky
+	Removed SSI and Perl Bluelog Live modes, CGI is the future!
+	Bluelog Live can now display device manufacturer if launched with "-lm"
+	Updated README.LIVE (needs improvement)
+
 03/27/13:
 	Merged in libmackerel
 	Merged in MACLIST from haraldscan

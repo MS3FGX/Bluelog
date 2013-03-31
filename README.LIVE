@@ -3,8 +3,8 @@
 ================================================================================
 
 Bluelog Live is technically a separate piece of software from the main Bluelog
-tool. It is comprised of simple static HTML pages and some different ways of
-letting it load in the plain text log files from Bluelog. 
+tool. It's comprised of simple static HTML pages and a CGI module that loads
+in the log files from Bluelog. 
 
 Bluelog is NOT a web server, it simply generates the HTML files which you will
 then serve with your HTTP daemon of choice (Apache, lighttpd, etc). Therefore,
@@ -13,21 +13,11 @@ configured properly. Bluelog is in fact completely unaware of the status of the
 Live pages while running, it just pumps out data and hopes for the best.
 
 --------------------------------------------------------------------------------
-- Live Mode Options                                                            -
+- Installing                                                                   -
 --------------------------------------------------------------------------------
 
-To better support different systems and environments, as of Bluelog 1.0.4 there
-are multiple ways to get Live mode up and running. I will attempt to make all
-the different methods work at the same time whenever possible, but the CGI
-module is the primary development target and will receive all the new features.
-
---------------------------------------------------------------------------------
-- Option 1: livelog.cgi                                                        -
---------------------------------------------------------------------------------
-
-This option is the most compatible, and should work in more or less any
-environment. The low requirements of the CGI module make it excellent for
-embedded systems such as OpenWRT, where installing Perl might not be an option.
+Bluelog Live mode makes use of a CGI module written in C, and should be
+compatible with any system that can run Bluelog.
 
 Under lighttpd, make sure you have something along the lines of the following
 in your configuration file:
@@ -35,57 +25,6 @@ in your configuration file:
 server.modules = ("mod_cgi")
 index-file.names = ( "index.html" )
 cgi.assign = (".cgi" => "")
-
---------------------------------------------------------------------------------
-- Option 2: livelog.pl                                                         -
---------------------------------------------------------------------------------
-
-This is the easiest method, if your environment supports it. livelog.pl is a
-Perl script intended to be run by your HTTP daemon of choice. Under lighttpd,
-you can easily serve it up as the default page with a few lines in your
-lighttpd.conf file:
-
-server.modules = ("mod_cgi")
-index-file.names = ( "livelog.pl" )
-cgi.assign = (".pl"  => "/usr/bin/perl")
-
-These commands load the CGI module, set "livelog.pl" as the default index page,
-and finally make sure .pl files are associated with Perl.
-
---------------------------------------------------------------------------------
-- Option 3: Server Side Includes                                               -
---------------------------------------------------------------------------------
-
-For this mode, you will need to configure the server to enable Server Side
-Includes (SSI) and recognize index.shtml as a valid default page.
-
-Under lighttpd, you will need to make sure the following options (or something
-very similar) are in your /etc/lighttpd/lighttpd.conf file:
-
-server.modules = ("mod_ssi")
-index-file.names = ("index.shtml")
-ssi.extension = (".shtml")
-
-Restart lighttpd, and you should be good to go.
-
-Under Apache, the configuration is a little more involved. First, you have to
-edit your /etc/apache2/sites-available/default file to change the section for
-/var/www. The section should look something like the following when you are
-done:
-
-<Directory /var/www/>
-        Options Indexes FollowSymLinks MultiViews +Includes
-        AllowOverride None
-        Order allow,deny
-        allow from all
-        AddType text/html .shtml
-        AddOutputFilter INCLUDES .shtml
-        DirectoryIndex index.shtml
-</Directory>
-
-You then need to load the SSI module, which can be accomplished by running the
-command "a2enmod include". Then restart Apache with whatever method your
-distribution prefers.
 
 --------------------------------------------------------------------------------
 - General Notes                                                                -
@@ -119,42 +58,6 @@ array of web browsers. It is known to work on pretty much any half-way modern
 browser, including the relatively simplistic browsers included with systems like
 the PlayStation 3 (in fact, the PS3 was used extensively when testing to show
 results on a large screen).
-
---------------------------------------------------------------------------------
-- In-Browser Bluelog Control                                                   -
---------------------------------------------------------------------------------
-
-NOTE: CURRENTLY SSI MODE ONLY
-
-As of version 0.9.9, Bluelog Live includes experimental support for starting a
-Bluelog instance in daemon mode. The current method for doing this is very
-simple: the web interface uses SSI to start Bluelog with the following command:
-
-bluelog -ld
-
-This command can be modified in the control.shtml file located in the Bluelog
-Live webroot (by default: /usr/share/bluelog) if you want to customize
-Bluelog's output (such as enabling obfuscation).
-
-The built-in PID checking in Bluelog will prevent starting duplicate instances,
-so there is no danger of accidentally starting a second Bluelog thread.
-
---------------------------------------------------------------------------------
-- Bluelog Live Mobile Interface                                                -
---------------------------------------------------------------------------------
-
-NOTE: CURRENTLY SSI MODE ONLY
-
-As of version 1.0.0, Bluelog Live includes an experimental mobile version of
-the web interface. This version can be accessed at:
-
-http://servername/mobile.shtml
-
-A lot of information is left off of the mobile interface; you won't see the
-information about what Bluelog version is running or what time it started at,
-the "Device Capability" field is also dropped. The mobile version of the site
-simply shows the discovered time, MAC address, name, and class of each device
-found; along with a running total of how many devices have been found so far.
 
 --------------------------------------------------------------------------------
 - Future Development                                                           -

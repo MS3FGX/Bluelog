@@ -1,5 +1,5 @@
 // Configuration file for Bluelog
-#define VERSION	"1.1.1-dev"
+#define VERSION	"1.1.2-dev"
 #define APPNAME "Bluelog"
 
 // Platform generic settings
@@ -47,5 +47,16 @@
 #define LIVE_OUT "/tmp/live.log"
 #define LIVE_INF "/tmp/info.txt"
 #define PID_FILE "/tmp/bluelog.pid"
-#define OUIFILE "/usr/share/bluelog/MACLIST"
+#define OUIFILE "/usr/share/bluelog/oui.txt"
+#endif
+
+// These override the platform-specific options.
+// Live
+#ifdef NOLIVE
+#define LIVEMODE 0
+#endif
+
+// OUI Lookups
+#ifdef NOOUI
+#define OUILOOKUP 0
 #endif

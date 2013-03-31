@@ -15,7 +15,7 @@
 
 // Defines
 #define APPNAME "livelog.cgi"
-#define VERSION "0.6"
+#define VERSION "1.0"
 #define MAXNUM 4096
 #define MAXLINE 500
 #define INFO "/tmp/info.txt"
@@ -29,11 +29,17 @@
 #define CSSPREFIX "/"
 #endif
 
+// Global variables
+int mobile;
+
 // Found device struct
 struct btdev
 {
-	// Probably do something more with this eventually...
-	char line[MAXLINE];
+	char time[20];
+	char addr[18];
+	char name[248];
+	char class[248];
+	char hwinfo[248];
 };
 
 // Global variables
@@ -45,7 +51,7 @@ FILE *infofile;
 struct btdev dev_cache[MAXNUM];
 int device_index = 0;
 
-void PrintHeader(char *CSSFILE)
+void print_header(char *CSSFILE)
 {
 	// CGI header
 	puts("Content-type: text/html\n\n");
@@ -54,7 +60,7 @@ void PrintHeader(char *CSSFILE)
 	// HTML head
 	printf("<html><head><link href=\"%s%s\" type=\"text/css\" rel=\"stylesheet\" /></head><body>\n", CSSPREFIX,CSSFILE);
 }
-void SetupTable(int mobile)
+void setup_table()
 {
 	// Table setup
 	puts("<table border=\"1\" cellpadding=\"5\" cellspacing=\"5\" width=\"100%\">\n");
@@ -66,7 +72,7 @@ void SetupTable(int mobile)
 		"<th>MAC Address</th>\n"\
 		"<th>Device Name</th>\n"\
 		"<th>Device Class</th>\n"\
-		"<th>Capabilities</th>\n"\
+		"<th>Hardware Info</th>\n"\
 		"</tr>\n");
 	}
 	else
@@ -80,7 +86,7 @@ void SetupTable(int mobile)
 	}
 }
 
-void PrintInfo(void)
+void print_info()
 {
 	// Line length
 	char line [128];
@@ -89,28 +95,46 @@ void PrintInfo(void)
 		fputs(line,stdout);
 }
 
-void ReadResults(void)
+void read_log()
 {
-	// Line length
-	char line [MAXLINE];
-	
+	char line [MAXLINE];	
 	while (fgets(line,sizeof line,logfile))
 	{
-		strcpy(dev_cache[device_index].line,line);
+		// Copy line to buffer
+		char* line_buffer = strdup(line);
+	
+		// Populate cache entry from file
+		strcpy(dev_cache[device_index].time,strsep(&line_buffer, ","));	
+		strcpy(dev_cache[device_index].addr,strsep(&line_buffer, ","));	
+		strcpy(dev_cache[device_index].name,strsep(&line_buffer, ","));
+		strcpy(dev_cache[device_index].class,strsep(&line_buffer, ","));
+		strcpy(dev_cache[device_index].hwinfo,strsep(&line_buffer, "\n"));
+		
+        // Increment index
 		device_index++;
 	}
 }
 
-void PrintResults(void)
+void print_devices()
 {
 	while (device_index > 0)
 	{	
-		printf("%s\n",dev_cache[device_index-1].line);
+		// Write out valid table HTML
+		printf("<tr>");
+		printf("<td>%s</td>",dev_cache[device_index-1].time);		
+		printf("<td>%s</td>",dev_cache[device_index-1].addr);	
+		printf("<td>%s</td>",dev_cache[device_index-1].name);	
+		printf("<td>%s</td>",dev_cache[device_index-1].class);	
+		
+		if(!mobile)
+			printf("<td>%s</td>",dev_cache[device_index-1].hwinfo);	
+		
+		printf("</tr>\n");
 		device_index--;
 	}
 }
 
-int ReadPID (void)
+int read_pid()
 {
 	// Any error will return 0
 	FILE *pid_file;
@@ -126,7 +150,7 @@ int ReadPID (void)
 	return pid;
 }
 
-void TopBar (void)
+void TopBar()
 {
 	// Discovered devices display
 	puts("<div id=\"content\">\n");
@@ -135,7 +159,7 @@ void TopBar (void)
 	puts("</div>\n");	
 }
 
-void SideBar(void)
+void SideBar()
 {	
 	// Start sidebar, Info pane
 	puts("<div id=\"sidebar\">\n"\
@@ -145,7 +169,7 @@ void SideBar(void)
 	"<div id=\"sidecontent\">");
 	
 	// Populate sidebar from files
-	PrintInfo();
+	print_info();
 	
 	// Close up info pane
 	puts("</div>\n"\
@@ -161,7 +185,7 @@ void SideBar(void)
 	// Print current PID status
 	puts("<div class=\"sideitem\">");
 	puts("Bluelog: ");	
-	if (ReadPID() != 0)
+	if (read_pid() != 0)
 		puts("<span style=\"color: #00ff00;\"><b>RUNNING</b></span></div>\n");
 	else
 		puts("<span style=\"color: #ff0000;\"><b>STOPPED</b></span></div>\n");	
@@ -177,7 +201,7 @@ void SideBar(void)
 	"</div>\n");
 }
 
-void ShutDown(void)
+void shut_down(void)
 {
 	// Close files
 	fclose(infofile);
@@ -203,7 +227,7 @@ static void help(void)
 		"\n");
 }
 
-static void DebugInfo(void)
+static void debug(void)
 {
 printf("System Variables\n");
 printf("--------------------------\n");
@@ -234,7 +258,6 @@ int main(int argc, char *argv[])
 
 	// Handle arguments
 	int opt;
-	int mobile = 0;
 	while ((opt=getopt_long(argc, argv, "dvhm", main_options, NULL)) != EOF)
 	{
 		switch (opt)
@@ -243,7 +266,7 @@ int main(int argc, char *argv[])
 			help();
 			exit(0);
 		case 'd':
-			DebugInfo();
+			debug();
 			exit(0);
 		case 'v':
 			printf("%s (v%s) by MS3FGX\n", APPNAME, VERSION);
@@ -275,7 +298,7 @@ int main(int argc, char *argv[])
 	char *logfilename = LOG;
 	
 	// File header
-	PrintHeader(CSSFILE);
+	print_header(CSSFILE);
 	
 	// Start container div
 	if (!mobile)
@@ -301,7 +324,7 @@ int main(int argc, char *argv[])
 	}
 	
 	// Draw sidebar\topbar
-	ReadResults();
+	read_log();
 	if (!mobile)
 		SideBar();
 	else
@@ -313,8 +336,8 @@ int main(int argc, char *argv[])
 	if (device_index > 0)
 	{
 		// Print results
-		SetupTable(mobile);
-		PrintResults();
+		setup_table();
+		print_devices();
 		puts("</table>\n");
 	}
 	
@@ -322,7 +345,7 @@ int main(int argc, char *argv[])
 	puts("</div></body></html>");
 	
 	// Close files and exit
-	ShutDown();
+	shut_down();
 	return 0;
 }
 

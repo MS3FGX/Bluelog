@@ -62,6 +62,7 @@ inquiry_info *results; // BlueZ scan results struct
 int bt_socket; // HCI device
 int showtime = 0; // Show timestamps in log		
 int quiet = 0; // Print output normally
+int getmanufacturer = 0; // OUI lookups
 			
 struct btdev dev_cache[MAX_DEV]; // Init device cache
 
@@ -123,7 +124,7 @@ void shut_down(int sig)
 	exit(sig);
 }
 
-void live_entry (int index)
+void live_entry(int index)
 {
 	// Local variables 
 	char local_name[248];
@@ -143,14 +144,19 @@ void live_entry (int index)
 	if (!strcmp(local_capabilities, "VOID"))
 		strcpy(local_capabilities, "Not Reported");
 		
-	// Write out HTML code
-	fprintf(outfile,"<tr>");
-	fprintf(outfile,"<td>%s</td>", dev_cache[index].time);
-	fprintf(outfile,"<td>%s</td>", dev_cache[index].addr);
-	fprintf(outfile,"<td>%s</td>", local_name);
-	fprintf(outfile,"<td>%s</td>", local_class);
-	fprintf(outfile,"<td>%s</td>", local_capabilities);
-	fprintf(outfile,"</tr>\n");
+	// Write out log
+	fprintf(outfile,"%s,", dev_cache[index].time);
+	fprintf(outfile,"%s,", dev_cache[index].addr);
+	fprintf(outfile,"%s,", local_name);
+	fprintf(outfile,"%s,", local_class);
+	
+	// Last field is variable
+	if (getmanufacturer)
+		fprintf(outfile,"%s", mac_get_vendor(dev_cache[index].addr));
+	else
+		fprintf(outfile,"%s", local_capabilities);
+		
+	fprintf(outfile,"\n");
 }
 
 int read_pid (void)
@@ -381,7 +387,6 @@ int main(int argc, char *argv[])
 	int amnesia = -1;
 	int syslogonly = 0;
 	int encode = 0;
-	int getmanufacturer = 0;
 	
 	// Pointers to filenames
 	char *infofilename = LIVE_INF;
@@ -936,7 +941,7 @@ int main(int argc, char *argv[])
 						
 						// Print time first if enabled
 						if (showtime)
-							sprintf(outbuffer,"[%s] ", dev_cache[ri].time);
+							sprintf(outbuffer,"[%s],", dev_cache[ri].time);
 							
 						// Always output MAC
 						sprintf(outbuffer+strlen(outbuffer),"%s", dev_cache[ri].addr);
