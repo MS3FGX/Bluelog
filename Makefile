@@ -33,16 +33,20 @@ bluelog: bluelog.c
 livelog: livelog.c
 	$(CC) $(CFLAGS) livelog.c -o $(CGIPRE)livelog.cgi
 
+# Download OUI file
+ouifile: bluelog.c
+	./gen_oui.sh check
+
 # Build tarball
 release: clean
 	tar --exclude='.*' -C ../ -czvf /tmp/$(APPNAME)-$(VERSION).tar.gz $(APPNAME)-$(VERSION)
 
 # Clean for dist
 clean:
-	rm -rf $(APPNAME) $(CGIPRE)livelog.cgi *.o *.log *.gz *.cgi
+	rm -rf $(APPNAME) $(CGIPRE)livelog.cgi *.o *.txt *.log *.gz *.cgi
 
 # Install to system
-install: bluelog livelog
+install: bluelog livelog ouifile
 	mkdir -p $(DESTDIR)/usr/bin/
 	mkdir -p $(DESTDIR)/usr/share/doc/$(APPNAME)-$(VERSION)/
 	mkdir -p $(DESTDIR)/usr/share/man/man1
@@ -51,6 +55,7 @@ install: bluelog livelog
 	cp -a $(DOCS) $(DESTDIR)/usr/share/doc/$(APPNAME)-$(VERSION)/
 	gzip -c $(APPNAME).1 >> $(APPNAME).1.gz
 	cp $(APPNAME).1.gz $(DESTDIR)/usr/share/man/man1/
+	cp oui.txt $(DESTDIR)/usr/share/$(APPNAME)/
 	cp -a --no-preserve=ownership www/* $(DESTDIR)/usr/share/$(APPNAME)/
 	cd $(DESTDIR)/usr/share/$(APPNAME)/ ; ln -sf $(DEFAULT_CSS) style.css
 

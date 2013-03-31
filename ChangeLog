@@ -1,5 +1,5 @@
 03/31/13:
-	Switched out Haraldscan MACLIST for IEEE list. So many bytes...
+	Makefile now downloads OUI list during build
 
 03/30/13:
 	Added "standalone" target to Makefile, kind of hacky
