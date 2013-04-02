@@ -23,6 +23,7 @@
 #include <getopt.h>
 #include <signal.h>
 #include <time.h>
+#include <sys/ioctl.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/socket.h>
@@ -56,7 +57,7 @@
 // PWNPLUG specific
 #elif PWNPLUG
 #define VER_MOD "-PWN"
-#define MAX_DEV 4096
+#define MAX_DEV 200
 #define LIVEMODE 1
 #define OUT_PATH "/dev/shm/"
 #define LIVE_OUT "/tmp/live.log"
@@ -65,7 +66,7 @@
 #else
 // Generic x86
 #define VER_MOD ""
-#define MAX_DEV 4096
+#define MAX_DEV 200
 #define LIVEMODE 1
 #define OUT_PATH ""
 #define LIVE_OUT "/tmp/live.log"
@@ -613,6 +614,7 @@ int main(int argc, char *argv[])
 		// Failed to open device, that can't be good
 		exit(1);
 	}
+	
 	// If we get here the device should be online.
 	if (!quiet)
 		printf("OK\n");
@@ -717,19 +719,14 @@ int main(int argc, char *argv[])
 		num_results = hci_inquiry(device, scan_time, max_results, NULL, &results, flags);
 		
 		// A negative number here means an error during scan
-		if(num_results < 0)
-		{
+		if (num_results < 0) {
 			// Increment error count
 			error_count++;
 			
-			// Ignore occasional errors on Pwn Plug and OpenWRT
-			#if !defined PWNPLUG || OPENWRT
 			// All other platforms, print error and bail out
-			syslog(LOG_ERR,"Received error from BlueZ!");
-			printf("Scan failed!\n");
+			syslog(LOG_ERR,"Scan failed, received error from BlueZ!");
 			// Check for kernel 3.0.x
-			if (!strncmp("3.0.",sysinfo.release,4))
-			{
+			if (!strncmp("3.0.",sysinfo.release,4)) {
 				printf("\n");
 				printf("-----------------------------------------------------\n");
 				printf("Device scanning failed, and you are running a 3.0.x\n");
@@ -741,10 +738,18 @@ int main(int argc, char *argv[])
 				printf("You will need to upgrade your kernel to at least the\n");
 				printf("the 3.1 series to continue.\n");
 				printf("-----------------------------------------------------\n");
-
+				
+			} 
+			
+			syslog(LOG_ERR,"Resetting USB device\n");
+			int rc = ioctl( bt_socket, HCIDEVRESET, device);
+			if (rc < 0) {
+				syslog(LOG_ERR,"Error in ioctl");
+				shut_down(1);
+			} else {
+				printf("Reset successful\n");
 			}
-			shut_down(1);
-			#else
+			
 			// Exit on back to back errors
 			if (error_count > 5)
 			{
@@ -755,7 +760,7 @@ int main(int argc, char *argv[])
 			
 			// Otherwise, throttle back a bit, might help
 			sleep(1);
-			#endif
+			continue;
 		}
 		else
 		{
