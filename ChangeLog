@@ -1,3 +1,7 @@
+04/01/13:
+	Removed README.BAKTRK, redundant info
+	Removed FUTURE, most major items accomplished
+
 03/31/13:
 	Makefile now downloads OUI list during build
 
