@@ -707,7 +707,22 @@ int main(int argc, char *argv[])
 		if (!quiet)
 			printf("Hit Ctrl+C to end scan.\n");
 	}
-		
+	
+	// Check for kernel 3.0.x
+	if (!strncmp("3.0.",sysinfo.release,4)) {
+		printf("\n");
+		printf("-----------------------------------------------------\n");
+		printf("Device scanning may fail, since you are running a 3.0.x\n");
+		printf("Linux kernel. This potential failure is probably due to the\n");
+		printf("following kernel bug:\n");
+		printf("\n");
+		printf("http://marc.info/?l=linux-kernel&m=131629118406044\n");
+		printf("\n");
+		printf("You will need to upgrade your kernel to at least the\n");
+		printf("the 3.1 series to continue.\n");
+		printf("-----------------------------------------------------\n");
+	}
+ 
 	// Init result struct
 	results = (inquiry_info*)malloc(max_results * sizeof(inquiry_info));
 
@@ -725,21 +740,6 @@ int main(int argc, char *argv[])
 			
 			// All other platforms, print error and bail out
 			syslog(LOG_ERR,"Scan failed, received error from BlueZ!");
-			// Check for kernel 3.0.x
-			if (!strncmp("3.0.",sysinfo.release,4)) {
-				printf("\n");
-				printf("-----------------------------------------------------\n");
-				printf("Device scanning failed, and you are running a 3.0.x\n");
-				printf("Linux kernel. This failure is probably due to the\n");
-				printf("following kernel bug:\n");
-				printf("\n");
-				printf("http://marc.info/?l=linux-kernel&m=131629118406044\n");
-				printf("\n");
-				printf("You will need to upgrade your kernel to at least the\n");
-				printf("the 3.1 series to continue.\n");
-				printf("-----------------------------------------------------\n");
-				
-			} 
 			
 			syslog(LOG_ERR,"Resetting USB device\n");
 			int rc = ioctl( bt_socket, HCIDEVRESET, device);
@@ -751,9 +751,7 @@ int main(int argc, char *argv[])
 			}
 			
 			// Exit on back to back errors
-			if (error_count > 5)
-			{
-				printf("Scan failed!\n");				
+			if (error_count > 5) {
 				syslog(LOG_ERR,"BlueZ not responding, unrecoverable!");
 				shut_down(1);
 			}
