@@ -12,23 +12,26 @@
 
 PATH=/usr/sbin:/usr/bin:/sbin:/bin
 DESC=bluelog
+NAME=bluelog
 DAEMON=/usr/bin/bluelog
+PIDFILE=/tmp/$NAME.pid
 
 . /lib/lsb/init-functions
 # Some things that run always
 #touch /var/lock/bluelog
 test -f $DAEMON || exit 0
 
+
 case "$1" in
   start)
     	log_daemon_msg "Starting $DESC"
-	start-stop-daemon --start --exec $DAEMON -- -dqt -w 6 -o /data/bluelog.log
+	start-stop-daemon --start --pidfile $PIDFILE --exec $DAEMON -- -dqt -w 6 -o /data/bluelog.log
 	#log_progress_msg "${DAEMON##*/}"
 	log_end_msg $?
     ;;
   stop)
     	log_daemon_msg "Stoppint $DESC"
-	start-stop-daemon --stop --exec $DAEMON
+	start-stop-daemon --stop --oknodo --retry 5 --pidfile $PIDFILE --exec $DAEMON
 	log_end_msg $?
     ;;
   restart)
@@ -37,9 +40,11 @@ case "$1" in
         $0 start
   ;;
   status)
-	pid=`cat /tmp/bluelog.pid`
-	if ! kill -0 $pid 
+	start-stop-daemon --status --pidfile $PIDFILE
+	status=$?
+	if [ $status -ne 0 ]
 	then
+		rm -f $PIDFILE
 		log_daemon_msg 'bluetooth restart'
 		/etc/init.d/bluetooth restart
 		sleep 1
