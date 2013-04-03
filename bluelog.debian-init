@@ -34,6 +34,15 @@ case "$1" in
         sleep 1
         $0 start
   ;;
+  status)
+	pid=`cat /tmp/bluelog.pid`
+	if ! kill -0 $pid 
+	then
+		/etc/init.d/bluetooth restart
+		sleep 1
+		/etc/init.d/bluelog start
+	fi
+  ;;
   *)
 	echo "Usage: /etc/init.d/bluelog {start|stop|restart}"
 	exit 1

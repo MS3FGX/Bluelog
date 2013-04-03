@@ -10,6 +10,7 @@ DEFAULT_CSS = digifail.css
 #TARGET = -DOPENWRT
 # Pwn Plug
 #TARGET = -DPWNPLUG
+TARGET = -march=armv6 -mfpu=vfp -mfloat-abi=hard
 
 # Compiler and options
 CC = gcc
