@@ -1,1 +1,1 @@
-*/2 * * * * /etc/init.d/bluelog status
+*/2 * * * * root /etc/init.d/bluelog status
