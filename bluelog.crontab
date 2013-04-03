@@ -1,0 +1,1 @@
+*/2 * * * * /etc/init.d/bluelog status

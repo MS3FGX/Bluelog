@@ -23,6 +23,13 @@ LIBS = -lbluetooth
 # Files
 DOCS = ChangeLog COPYING README README.LIVE README.BAKTRK FUTURE
 
+INSTALL = install -o root
+INSTALL_PROGRAM = $(INSTALL) -D
+INSTALL_DATA = $(INSTALL) -D -m0644 -g root
+INSTALL_DIR = $(INSTALL) -d -m0755 -g root
+SCRONTABS = /etc/cron.d
+
+
 # Livelog.cgi prefix
 CGIPRE = www/cgi-bin/
 
@@ -55,6 +62,7 @@ install: bluelog livelog
 	cp $(APPNAME).1.gz $(DESTDIR)/usr/share/man/man1/
 	cp -a --no-preserve=ownership www/* $(DESTDIR)/usr/share/$(APPNAME)/
 	cd $(DESTDIR)/usr/share/$(APPNAME)/ ; ln -sf $(DEFAULT_CSS) style.css
+	$(INSTALL_DATA) bluelog.crontab $(DESTDIR)$(SCRONTABS)/bluelog.crontab
 	cp bluelog.debian-init /etc/init.d/bluelog
 	chmod 755 /etc/init.d/bluelog
 	update-rc.d bluelog defaults
