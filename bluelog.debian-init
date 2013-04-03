@@ -9,12 +9,14 @@
 # Description:       Log bluetooth devices
 ### END INIT INFO
 
+
+PATH=/usr/sbin:/usr/bin:/sbin:/bin
 DESC=bluelog
 DAEMON=/usr/bin/bluelog
 
 . /lib/lsb/init-functions
 # Some things that run always
-touch /var/lock/bluelog
+#touch /var/lock/bluelog
 test -f $DAEMON || exit 0
 
 case "$1" in
@@ -38,13 +40,15 @@ case "$1" in
 	pid=`cat /tmp/bluelog.pid`
 	if ! kill -0 $pid 
 	then
+		log_daemon_msg 'bluetooth restart'
 		/etc/init.d/bluetooth restart
 		sleep 1
-		/etc/init.d/bluelog start
+		log_daemon_msg 'bluelog start'
+		$0 start
 	fi
   ;;
   *)
-	echo "Usage: /etc/init.d/bluelog {start|stop|restart}"
+	echo "Usage: /etc/init.d/bluelog {start|stop|restart|status}"
 	exit 1
 	;;
 esac
