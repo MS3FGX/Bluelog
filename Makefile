@@ -19,7 +19,7 @@ CFLAGS += -Wall -O2 $(TARGET)
 LIBS = -lbluetooth -lm
 
 # Files
-DOCS = ChangeLog COPYING README README.LIVE README.BAKTRK FUTURE
+DOCS = ChangeLog COPYING README README.LIVE
 
 # Livelog.cgi prefix
 CGIPRE = www/cgi-bin/

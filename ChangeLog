@@ -1,11 +1,14 @@
+04/03/13:
+	Fix Makefile after removing doc files
+
 04/01/13:
 	Removed README.BAKTRK, redundant info
 	Removed FUTURE, most major items accomplished
 
-03/31/13:
+03/31/13: 
 	Makefile now downloads OUI list during build
 
-03/30/13:
+03/30/13: Released as Version 1.1.1
 	Added "standalone" target to Makefile, kind of hacky
 	Removed SSI and Perl Bluelog Live modes, CGI is the future!
 	Bluelog Live can now display device manufacturer if launched with "-lm"
