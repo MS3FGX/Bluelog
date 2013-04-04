@@ -51,15 +51,57 @@ FILE *infofile;
 struct btdev dev_cache[MAXNUM];
 int device_index = 0;
 
+// Experimental, print all HTML from CGI module
+void print_html(char *CSSFILE)
+{	
+	// File info
+	printf("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\"\n"
+		"\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n");
+	
+	// Boilerplate
+	printf("<!--This file created by %s (v%s) by MS3FGX-->\n", APPNAME, VERSION);	
+	
+	printf("<html>\n"
+		"<head>\n"
+		"<title>Bluelog Live</title>\n"
+		"<meta http-equiv=\"Content-Type\" content=\"text/html; charset=iso-8859-1\" >\n");
+	
+
+	
+	// CSS file prefix
+	printf("<link href=\"%s%s\" type=\"text/css\" rel=\"stylesheet\" /></head><body>\n", CSSPREFIX,CSSFILE);
+
+	printf("<link rel=\"icon\" type=\"image/png\" href=\"/images/favicon.png\" />\n"
+		"<link rel=\"shortcut icon\" href=\"/images/favicon.png\" />\n"
+		"<META HTTP-EQUIV=\"refresh\" CONTENT=\"20\">\n"
+		"</head>\n"
+		"<body>\n"
+		"<div id=\"container\">\n"
+		"<div id=\"header\">\n"
+		"<span style=\"position:relative;left:15px;top:45px\">\n"
+		"<a href=\"http://www.digifail.com/\" target=\"_blank\" title=\"DigiFAIL\"><img src=\"/images/digifail_logo.png\" border=\"0\"></a>\n"
+		"</span>\n"
+		"</div>\n");
+
+	printf("<div class=\"footer\">\n"
+		"<h4>\n"
+		"<a href=\"about.html\" onClick=\"window.open('about.html','About','toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=no,resizable=no,width=500,height=320,left=50,top=50'); return false;\">About</a>\n"
+		"&nbsp;&nbsp;\n"
+		"<a href=\"contact.html\" onClick=\"window.open('contact.html','Contact','toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=no,resizable=no,width=500,height=510,left=50,top=50'); return false;\">Contact</a>\n"
+		"</h4>\n"
+		"</div>\n");
+}
+
 void print_header(char *CSSFILE)
-{
+{		
 	// CGI header
-	puts("Content-type: text/html\n\n");
+	printf("Content-type: text/html\n\n");
 	// Boilerplate
 	printf("<!--This file created with %s (v%s) by MS3FGX-->\n", APPNAME, VERSION);
 	// HTML head
 	printf("<html><head><link href=\"%s%s\" type=\"text/css\" rel=\"stylesheet\" /></head><body>\n", CSSPREFIX,CSSFILE);
 }
+
 void setup_table()
 {
 	// Table setup
@@ -299,6 +341,7 @@ int main(int argc, char *argv[])
 	
 	// File header
 	print_header(CSSFILE);
+	//print_html(CSSFILE);
 	
 	// Start container div
 	if (!mobile)
