@@ -11,14 +11,14 @@ DEFAULT_CSS = digifail.css
 # Pwn Plug
 #TARGET = -DPWNPLUG
 # Raspberry-pi
-TARGET = -DRPI -march=armv6 -mfpu=vfp -mfloat-abi=hard
+#TARGET = -DRPI -march=armv6 -mfpu=vfp -mfloat-abi=hard
 
 # Compiler and options
 CC = gcc
 CFLAGS += -Wall -O2 $(TARGET)
 
 # Libraries to link
-LIBS = -lbluetooth
+LIBS = -lbluetooth -lsqlite3
 
 # Files
 DOCS = ChangeLog COPYING README README.LIVE README.BAKTRK FUTURE

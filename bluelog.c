@@ -38,6 +38,12 @@
 #define VERSION	"1.0.5-RC1"
 #define APPNAME "Bluelog"
 
+#include <string.h>
+#include <sqlite3.h>
+#define TABLE "CREATE TABLE IF NOT EXISTS records(id INTEGER PRIMARY KEY, mac varchar(20), gathered_on DATETIME)"
+
+
+
 // Determine device-specific configs
 // OpenWRT specific
 #ifdef OPENWRT
@@ -372,6 +378,15 @@ int main(int argc, char *argv[])
 	#else
 	int scan_time = 3;
 	#endif
+
+	/* Database variables */
+	sqlite3 *db;
+	sqlite3_stmt * stmt;
+	char *zErrMsg = 0;
+	const char * tail = 0;
+	int rc;
+	char * sSQL = 0;
+	char * db_name = 0;
 	
 	// Maximum number of devices per scan
 	int max_results = 255;
@@ -644,6 +659,22 @@ int main(int argc, char *argv[])
 			printf("Error opening output file!\n");
 			exit(1);
 		}
+
+		/* Open and manage SQLITE database */
+		db_name = malloc(snprintf(NULL, 0, "%s.db", outfilename) + 1);
+		sprintf(db_name, "%s.db", outfilename);
+		sqlite3_open(db_name, &db);
+		sqlite3_exec(db, TABLE, NULL, NULL, &zErrMsg);
+		sqlite3_exec(db, "PRAGMA synchronous = OFF", NULL, NULL, &zErrMsg);
+		rc = sqlite3_exec(db, "PRAGMA journal_mode = MEMORY", NULL, NULL, &zErrMsg);
+	 	if( rc ){
+			fprintf(stderr, "Can't open database: %s\n", sqlite3_errmsg(db));
+			sqlite3_close(db);
+			exit(1);
+		}
+		sSQL = "INSERT INTO records VALUES (NULL, @sMAC, @sDATE)";
+		sqlite3_prepare_v2(db, sSQL, strlen(sSQL), &stmt, &tail);
+
 		if (!quiet)
 			printf("OK\n");
 	}
@@ -769,14 +800,19 @@ int main(int argc, char *argv[])
 		// Check if we need to reset device cache
 		if ((cache_index + num_results) >= MAX_DEV)
 		{
-			syslog(LOG_INFO,"Resetting device cache...");
+			// syslog(LOG_INFO,"Resetting device cache...");
 			memset(dev_cache, 0, sizeof(dev_cache));
 			cache_index = 0;
 		}
-			
+
+		/* Explicitly begin a transaction once for all gathered macs at each 
+		*  turn; wrapping a sequence of insert by a single transaction makes
+		*  inserts faster rather than a transaction for each insert (default)
+		*/
+		sqlite3_exec(db, "BEGIN TRANSACTION", NULL, NULL, &zErrMsg);	
+
 		// Loop through results
-		for (i = 0; i < num_results; i++)
-		{	
+		for (i = 0; i < num_results; i++) {	
 			// Return current MAC from struct
 			ba2str(&(results+i)->bdaddr, addr);
 			
@@ -920,11 +956,20 @@ int main(int argc, char *argv[])
 						memset(outbuffer, 0, sizeof(outbuffer));
 						
 						// Print time first if enabled
-						if (showtime)
+						if (showtime) {
 							sprintf(outbuffer,"[%s] ", dev_cache[ri].time);
+							sqlite3_bind_text(stmt, 2, dev_cache[ri].time, -1,  SQLITE_STATIC); 
+						}
 							
 						// Always output MAC
 						sprintf(outbuffer+strlen(outbuffer),"%s", dev_cache[ri].addr);
+						sqlite3_bind_text(stmt, 1, dev_cache[ri].addr, -1, SQLITE_TRANSIENT);
+						// run the insert
+						sqlite3_step(stmt);
+						// Clear stmt for the next insert
+						sqlite3_clear_bindings(stmt);
+						sqlite3_reset(stmt);
+
 						
 						// Optionally output class
 						if (showclass)					
@@ -955,6 +1000,8 @@ int main(int argc, char *argv[])
 			// Write any new changes
 			if (!syslogonly)
 				fflush(outfile);
+			sqlite3_exec(db, "END TRANSACTION", NULL, NULL, &zErrMsg);
+			
 		}
 	}
 	// Clear out results buffer
