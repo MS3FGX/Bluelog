@@ -3,7 +3,7 @@ APPNAME = bluelog
 VERSION = 1.1.2
 
 # Bluelog-specific, select which CSS theme to use as default
-# Options: digifail.css, backtrack.css, pwnplug.css, openwrt.css
+# Options: digifail.css, backtrack.css, pwnplug.css, openwrt.css, lcars.css
 DEFAULT_CSS = digifail.css
 
 # Debug, build as if on OpenWRT

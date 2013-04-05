@@ -1,0 +1,143 @@
+/* LCARS theme for Bluelog Live */
+html, body
+{
+	margin: 0; 
+	padding: 0;
+	height: 100%;
+	background-color: #000000;
+	color: #9999CC;
+	font-family: arial, sans-serif;
+	font-size: 12px;
+	overflow: hidden;
+	text-transform: uppercase;
+}
+
+/* Used for footer link */
+h4, h4 a
+{
+	position: relative;
+	text-align: right;
+	margin-top: 4px;
+	right: 2px;
+	color: #FF9C27;
+	font-size: 10px;
+}
+
+#header
+{
+	/* Logo, can change in CSS without touching HTML */
+	background-image: url('images/lcars_head.png');
+	background-repeat: no-repeat;
+	height: 64px;
+	text-indent: -9999px;
+	margin-bottom: 5px;
+}
+
+/* Whole page goes in here */
+#container
+{
+	width: 100%;
+	height: 100%;
+	background-color: #000000;
+	overflow-y: hidden;
+}
+	
+/* Banish footer bar to bottom of container object */
+#container div.footer
+{
+	position: absolute;
+	bottom: 0;
+	height: 20px;
+	width: 100%;
+	background-color: #182842;
+	border-top: 1px solid  #FF9C27;
+	z-index: -1;
+}
+
+/* Page content goes here */
+#content
+{
+	height: 80%;
+	font-size: 18px;
+	color: #9999CC;
+	background-color: #000000;
+	border: 8px solid #FFCC99;
+	padding: 10px;
+	/* This might not be standard compliant */
+	overflow-x: hidden;
+	overflow-y: auto;
+	border-radius: 15px;
+}
+
+/* Keeps sidebar objects in their own area */
+#sidebar
+{
+	float: left;
+}
+	
+/* Generic sidebar container */
+#sideobject
+{
+	/* Set margin against content here, makes Opera happy */
+	margin-right: 10px;
+	width: 200px;
+}
+
+#sidebox
+{
+	background-color: #FF9900;
+	padding: 10px;
+	margin-bottom: 5px;
+}
+
+#sidecontent
+{
+	margin: 2px;
+	padding: 5px 5px 0px 5px;
+	text-transform: uppercase;
+}
+
+.sideitem
+{
+	text-align:center;
+	margin-bottom: 5px;
+	font-weight: bold;
+	font-size:15px;
+	color: #000000;
+}
+
+/* Generic sidebar box header */	 
+#boxheader
+{
+	height: 30px;
+	width: 200px;
+	line-height: 30px;
+	color: #000000;
+	font-family: arial, sans-serif;
+	font-weight: bold;
+	font-size: 18px;
+	text-align: center;
+	background-color: #CC6666;
+	margin-bottom: 5px;
+	text-transform: uppercase;
+}
+
+/* Table CSS */
+th
+{
+	color: #000000;
+	background-color: #CC99CC;
+	border: 1px;
+	border-radius: 15px;
+}
+
+table,td
+{
+	color: #FF9900;
+	font-weight: bold;
+	font-size: 15px;
+	text-align: center;
+	border: 0px;
+}
+
+/* EOF */
