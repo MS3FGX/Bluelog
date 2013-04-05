@@ -13,6 +13,8 @@ DEFAULT_CSS = digifail.css
 # Raspberry-pi
 #TARGET = -DRPI -march=armv6 -mfpu=vfp -mfloat-abi=hard
 
+#TARGET += -DSQLITE
+
 # Compiler and options
 CC = gcc
 CFLAGS += -Wall -O2 $(TARGET)

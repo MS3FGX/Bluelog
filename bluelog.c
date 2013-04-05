@@ -38,10 +38,11 @@
 #define VERSION	"1.0.5-RC1"
 #define APPNAME "Bluelog"
 
+#ifdef SQLITE
 #include <string.h>
 #include <sqlite3.h>
 #define TABLE "CREATE TABLE IF NOT EXISTS records(id INTEGER PRIMARY KEY, mac varchar(20), gathered_on DATETIME)"
-
+#endif
 
 
 // Determine device-specific configs
@@ -151,9 +152,12 @@ void shut_down(int sig)
 		fprintf(outfile,"[%s] Scan ended.\n", get_localtime());
 	
 	// Don't try to close a file that doesn't exist, kernel gets mad
-	if (!syslogonly)
+	if (!syslogonly) {
 		fclose(outfile);
-	
+		#ifdef SQLITE
+		sqlite3_close(db);
+		#endif
+	}
 	free(results);
 	//free(dev_cache);
 	close(bt_socket);
@@ -378,7 +382,7 @@ int main(int argc, char *argv[])
 	#else
 	int scan_time = 3;
 	#endif
-
+	#ifdef SQLITE
 	/* Database variables */
 	sqlite3 *db;
 	sqlite3_stmt * stmt;
@@ -387,7 +391,7 @@ int main(int argc, char *argv[])
 	int rc;
 	char * sSQL = 0;
 	char * db_name = 0;
-	
+	#endif
 	// Maximum number of devices per scan
 	int max_results = 255;
 	int num_results;
@@ -659,7 +663,7 @@ int main(int argc, char *argv[])
 			printf("Error opening output file!\n");
 			exit(1);
 		}
-
+		#ifdef SQLITE
 		/* Open and manage SQLITE database */
 		db_name = malloc(snprintf(NULL, 0, "%s.db", outfilename) + 1);
 		sprintf(db_name, "%s.db", outfilename);
@@ -674,7 +678,7 @@ int main(int argc, char *argv[])
 		}
 		sSQL = "INSERT INTO records VALUES (NULL, @sMAC, @sDATE)";
 		sqlite3_prepare_v2(db, sSQL, strlen(sSQL), &stmt, &tail);
-
+		#endif
 		if (!quiet)
 			printf("OK\n");
 	}
@@ -809,8 +813,9 @@ int main(int argc, char *argv[])
 		*  turn; wrapping a sequence of insert by a single transaction makes
 		*  inserts faster rather than a transaction for each insert (default)
 		*/
+		#ifdef SQLITE
 		sqlite3_exec(db, "BEGIN TRANSACTION", NULL, NULL, &zErrMsg);	
-
+		#endif
 		// Loop through results
 		for (i = 0; i < num_results; i++) {	
 			// Return current MAC from struct
@@ -958,17 +963,21 @@ int main(int argc, char *argv[])
 						// Print time first if enabled
 						if (showtime) {
 							sprintf(outbuffer,"[%s] ", dev_cache[ri].time);
+							#ifdef SQLITE
 							sqlite3_bind_text(stmt, 2, dev_cache[ri].time, -1,  SQLITE_STATIC); 
+							#endif
 						}
 							
 						// Always output MAC
 						sprintf(outbuffer+strlen(outbuffer),"%s", dev_cache[ri].addr);
+						#ifdef SQLITE
 						sqlite3_bind_text(stmt, 1, dev_cache[ri].addr, -1, SQLITE_TRANSIENT);
 						// run the insert
 						sqlite3_step(stmt);
 						// Clear stmt for the next insert
 						sqlite3_clear_bindings(stmt);
 						sqlite3_reset(stmt);
+						#endif
 
 						
 						// Optionally output class
@@ -1000,7 +1009,10 @@ int main(int argc, char *argv[])
 			// Write any new changes
 			if (!syslogonly)
 				fflush(outfile);
+			#ifdef SQLITE
 			sqlite3_exec(db, "END TRANSACTION", NULL, NULL, &zErrMsg);
+			#endif
+			
 			
 		}
 	}
