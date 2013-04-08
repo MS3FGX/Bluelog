@@ -6,12 +6,16 @@ VERSION = 1.0.5
 # Options: digifail.css, backtrack.css, pwnplug.css, openwrt.css
 DEFAULT_CSS = digifail.css
 
+MACHINE = $(shell "uname -m" 2> /dev/null)
+ifeq ($(MACHINE), armv6l)
+TARGET = -DRPI -march=armv6 -mfpu=vfp -mfloat-abi=hard
+else
 # Debug, build as if on OpenWRT
 #TARGET = -DOPENWRT
 # Pwn Plug
 #TARGET = -DPWNPLUG
 # Raspberry-pi
-#TARGET = -DRPI -march=armv6 -mfpu=vfp -mfloat-abi=hard
+endif
 
 #TARGET += -DSQLITE
 
