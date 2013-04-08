@@ -6,7 +6,7 @@ VERSION = 1.0.5
 # Options: digifail.css, backtrack.css, pwnplug.css, openwrt.css
 DEFAULT_CSS = digifail.css
 
-MACHINE = $(shell "uname -m" 2> /dev/null)
+MACHINE = $(shell sh -c 'uname -m' 2> /dev/null || echo 'error')
 ifeq ($(MACHINE), armv6l)
 TARGET = -DRPI -march=armv6 -mfpu=vfp -mfloat-abi=hard
 else
@@ -42,6 +42,7 @@ CGIPRE = www/cgi-bin/
 # Targets
 # Build Bluelog
 bluelog: bluelog.c
+	echo $(MACHINE)
 	$(CC) $(CFLAGS) bluelog.c $(LIBS) -o $(APPNAME)
 
 # Build CGI module
