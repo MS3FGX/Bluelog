@@ -42,7 +42,6 @@ CGIPRE = www/cgi-bin/
 # Targets
 # Build Bluelog
 bluelog: bluelog.c
-	echo $(MACHINE)
 	$(CC) $(CFLAGS) bluelog.c $(LIBS) -o $(APPNAME)
 
 # Build CGI module
