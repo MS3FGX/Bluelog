@@ -2,12 +2,13 @@
 #define VERSION	"1.1.2-dev"
 #define APPNAME "Bluelog"
 
-// Platform generic settings
+// Generic 
 #define MAX_SCAN 30
 #define MIN_SCAN 3
 
-// Determine device-specific configs
-// OpenWRT specific
+// Device specific
+
+// OpenWRT
 #ifdef OPENWRT
 #define VER_MOD "-WRT"
 // Maximum number of devices in cache
@@ -26,10 +27,10 @@
 #define PID_FILE "/tmp/bluelog.pid"
 // File for OUI database
 #define OUIFILE ""
-// PWNPLUG specific
+// Pwnie Express Pwn Plug
 #elif PWNPLUG
 #define VER_MOD "-PWN"
-#define MAX_DEV 4096
+#define MAX_DEV 2048
 #define LIVEMODE 1
 #define OUILOOKUP 0
 #define OUT_PATH "/dev/shm/"
@@ -37,6 +38,17 @@
 #define LIVE_INF "/tmp/info.txt"
 #define PID_FILE "/tmp/bluelog.pid"
 #define OUIFILE ""
+// Pwnie Express Pwn Pad
+#elif PWNPAD
+#define VER_MOD "-PAD"
+#define MAX_DEV 2048
+#define LIVEMODE 0
+#define OUILOOKUP 1
+#define OUT_PATH "/opt/pwnpad/captures/bluetooth/"
+#define LIVE_OUT ""
+#define LIVE_INF ""
+#define PID_FILE "/tmp/bluelog.pid"
+#define OUIFILE "/usr/share/bluelog/oui.txt"
 #else
 // Generic x86
 #define VER_MOD ""
