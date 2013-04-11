@@ -2,14 +2,13 @@
 APPNAME = bluelog
 VERSION = 1.1.2
 
-# Bluelog-specific, select which CSS theme to use as default
+# Determines which CSS theme to use as default
 # Options: digifail.css, backtrack.css, pwnplug.css, openwrt.css, lcars.css
 DEFAULT_CSS = digifail.css
 
-# Debug, build as if on OpenWRT
-#TARGET = -DOPENWRT
-# Pwn Plug
-#TARGET = -DPWNPLUG
+# Debug Targets
+# Options: -DOPENWRT, -DPWNPLUG, -DPWNPAD
+TARGET = -DPWNPAD
 
 # Compiler and options
 CC = gcc
@@ -34,7 +33,7 @@ livelog: livelog.c
 	$(CC) $(CFLAGS) livelog.c -o $(CGIPRE)livelog.cgi
 
 # Download OUI file
-ouifile: bluelog.c
+ouifile:
 	./gen_oui.sh check
 
 # Build tarball
@@ -72,7 +71,7 @@ standalone:
 	cp $(APPNAME).1.gz $(DESTDIR)/usr/share/man/man1/
 
 # Build for Pwn Plug
-pwnplug:
+pwnplug: removeold
 	$(CC) $(CFLAGS) -DPWNPLUG bluelog.c $(LIBS) -o $(APPNAME)
 	$(CC) $(CFLAGS) -DPWNPLUG livelog.c -o $(CGIPRE)livelog.cgi
 	mkdir -p $(DESTDIR)/usr/bin/
@@ -85,6 +84,14 @@ pwnplug:
 	cp --no-preserve=ownership www/images/email.png $(DESTDIR)/var/www/$(APPNAME)/images/
 	cp --no-preserve=ownership www/images/qrcontact.png $(DESTDIR)/var/www/$(APPNAME)/images/
 	cp --no-preserve=ownership www/images/pwnplug_logo.png $(DESTDIR)/var/www/$(APPNAME)/images/
+
+# Build for Pwn Pad
+pwnpad: removeold ouifile
+	$(CC) $(CFLAGS) -DPWNPAD bluelog.c $(LIBS) -o $(APPNAME)
+	mkdir -p $(DESTDIR)/usr/bin/
+	mkdir -p $(DESTDIR)/usr/share/$(APPNAME)/
+	cp oui.txt $(DESTDIR)/usr/share/$(APPNAME)/
+	cp $(APPNAME) $(DESTDIR)/usr/bin/
 
 # Upgrade from previous source install
 upgrade: removeold install
