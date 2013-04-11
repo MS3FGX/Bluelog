@@ -714,7 +714,11 @@ int main(int argc, char *argv[])
 		daemonize();
 	else
 		if (!quiet)
+			#if defined PWNPAD
+			printf("Close this window to end scan.\n");
+			#else
 			printf("Hit Ctrl+C to end scan.\n");
+			#endif
 		
 	// Init result struct
 	results = (inquiry_info*)malloc(max_results * sizeof(inquiry_info));	

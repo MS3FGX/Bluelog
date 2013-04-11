@@ -1,3 +1,8 @@
+04/11/13:
+	Initial work on Pwn Pad target:
+	No Live, OUI enabled, changed default log location, UI changes
+	Cache size reduced for Pwn Plug and Pwn Pad
+
 04/04/13:
 	Added LCARS theme for Bluelog Live. Problem?
 
