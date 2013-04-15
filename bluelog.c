@@ -41,7 +41,8 @@
 #ifdef SQLITE
 #include <string.h>
 #include <sqlite3.h>
-#define TABLE "CREATE TABLE IF NOT EXISTS records(id INTEGER PRIMARY KEY, mac varchar(20), gathered_on DATETIME)"
+#define TABLE "CREATE TABLE IF NOT EXISTS records(id INTEGER PRIMARY KEY, session_id INTEGER, mac VARCHAR(20), gathered_on DATETIME)"
+#define TABLE_EVENT "CREATE TABLE IF NOT EXISTS sessions(id INTEGER PRIMARY KEY, window integer, started_on DATETIME)"
 #endif
 
 
@@ -98,6 +99,9 @@ struct btdev
 
 // Global variables
 FILE *outfile; // Output file
+#ifdef SQLITE	/* Database variable */
+sqlite3 *db;
+#endif
 FILE *infofile; // Status file
 inquiry_info *results; // BlueZ scan results struct
 int bt_socket; // HCI device
@@ -389,6 +393,7 @@ int main(int argc, char *argv[])
 	char *zErrMsg = 0;
 	const char * tail = 0;
 	int rc;
+	long int session_id;
 	char * sSQL = 0;
 	char * db_name = 0;
 	#endif
@@ -668,7 +673,11 @@ int main(int argc, char *argv[])
 		db_name = malloc(snprintf(NULL, 0, "%s.db", outfilename) + 1);
 		sprintf(db_name, "%s.db", outfilename);
 		sqlite3_open(db_name, &db);
+		if (!quiet)		
+			printf("Opening sqlite db: %s...\n", db_name);
+		free(db_name);
 		sqlite3_exec(db, TABLE, NULL, NULL, &zErrMsg);
+		sqlite3_exec(db, TABLE_EVENT, NULL, NULL, &zErrMsg);
 		sqlite3_exec(db, "PRAGMA synchronous = OFF", NULL, NULL, &zErrMsg);
 		rc = sqlite3_exec(db, "PRAGMA journal_mode = MEMORY", NULL, NULL, &zErrMsg);
 	 	if( rc ){
@@ -676,8 +685,20 @@ int main(int argc, char *argv[])
 			sqlite3_close(db);
 			exit(1);
 		}
-		sSQL = "INSERT INTO records VALUES (NULL, @sMAC, @sDATE)";
-		sqlite3_prepare_v2(db, sSQL, strlen(sSQL), &stmt, &tail);
+		/* Log start time and parameters */
+		sSQL = malloc( 200 );
+		sprintf(sSQL, "INSERT INTO sessions VALUES (NULL, '%d', '%s')", scan_time, get_localtime() );
+		sqlite3_exec(db, sSQL, NULL, NULL, &zErrMsg);
+		session_id = sqlite3_last_insert_rowid(db);
+		sprintf(sSQL, "INSERT INTO records VALUES (NULL, '%ld', @sMAC, @sDATE)", session_id);
+		//sSQL = "INSERT INTO records VALUES (NULL, @sMAC, @sDATE)";
+		rc = sqlite3_prepare_v2(db, sSQL, strlen(sSQL), &stmt, &tail);
+		if (rc) {
+			fprintf(stderr, "Can't open database: %s\n", sqlite3_errmsg(db));
+			sqlite3_close(db);
+			exit(1);
+		}
+		printf("Sqlite statement ready\n");
 		#endif
 		if (!quiet)
 			printf("OK\n");

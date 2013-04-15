@@ -17,7 +17,7 @@ else
 # Raspberry-pi
 endif
 
-#TARGET += -DSQLITE
+TARGET += -DSQLITE
 
 # Compiler and options
 CC = gcc
