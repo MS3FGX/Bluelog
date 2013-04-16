@@ -633,9 +633,8 @@ int main(int argc, char *argv[])
 	
 	// Open device and catch errors
 	bt_socket = hci_open_dev(device); 
-	if (device < 0 || bt_socket < 0)
-	{
-		// Failed to open device, that can't be good
+	if (device < 0 || bt_socket < 0) {
+		sprintf(stdio, "\n");	// Failed to open device, that can't be good
 		exit(1);
 	}
 	
@@ -984,23 +983,21 @@ int main(int argc, char *argv[])
 						// Print time first if enabled
 						if (showtime) {
 							sprintf(outbuffer,"[%s] ", dev_cache[ri].time);
-							#ifdef SQLITE
-							sqlite3_bind_text(stmt, 2, dev_cache[ri].time, -1,  SQLITE_STATIC); 
-							#endif
 						}
 							
 						// Always output MAC
 						sprintf(outbuffer+strlen(outbuffer),"%s", dev_cache[ri].addr);
 						#ifdef SQLITE
 						sqlite3_bind_text(stmt, 1, dev_cache[ri].addr, -1, SQLITE_TRANSIENT);
+						sqlite3_bind_text(stmt, 2, dev_cache[ri].time, -1, SQLITE_STATIC); 
 						// run the insert
 						sqlite3_step(stmt);
 						// Clear stmt for the next insert
 						sqlite3_clear_bindings(stmt);
 						sqlite3_reset(stmt);
 						#endif
-
 						
+
 						// Optionally output class
 						if (showclass)					
 							sprintf(outbuffer+strlen(outbuffer),",0x%02x%02x%02x", dev_cache[ri].flags,\
