@@ -298,6 +298,10 @@ int main(int argc, char *argv[])
 	// Default CSS
 	char CSSFILE[12]="style.css";
 
+	// Pointers to filenames
+	char *infofilename = INFO;
+	char *logfilename = LOG;
+	
 	// Handle arguments
 	int opt;
 	while ((opt=getopt_long(argc, argv, "dvhm", main_options, NULL)) != EOF)
@@ -335,11 +339,11 @@ int main(int argc, char *argv[])
 	}
 	#endif
 
-	// Pointers to filenames
-	char *infofilename = INFO;
-	char *logfilename = LOG;
-	
-	// File header
+	// Read in environment variable
+	char* env_string;
+	env_string=getenv("QUERY_STRING");
+
+	// Print HTML head
 	print_header(CSSFILE);
 	//print_html(CSSFILE);
 	
