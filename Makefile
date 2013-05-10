@@ -8,7 +8,7 @@ DEFAULT_CSS = digifail.css
 
 # Debug Targets
 # Options: -DOPENWRT, -DPWNPLUG, -DPWNPAD
-TARGET = -DPWNPAD
+#TARGET = -DPWNPAD
 
 # Compiler and options
 CC = gcc
