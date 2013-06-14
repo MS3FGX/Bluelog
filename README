@@ -16,6 +16,9 @@ Of course, in the end I managed to expand Bluelog into doing a whole bunch of
 other stuff I didn't really need. But at least I still kept it optional, so you
 can always stick with the basics if that's all you want.
 
+Raspberry pi image requires:
+- bluetooth, libbluetooth-dev, git, 
+
 --------------------------------------------------------------------------------
 - Compatibility                                                                -
 --------------------------------------------------------------------------------
