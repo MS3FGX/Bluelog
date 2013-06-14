@@ -17,7 +17,11 @@ other stuff I didn't really need. But at least I still kept it optional, so you
 can always stick with the basics if that's all you want.
 
 Raspberry pi image requires:
+(only bluelog)
 - bluetooth, libbluetooth-dev, git, 
+(3g connection)
+- ppp, sakis3g script, usb-modeswitch
+
 
 --------------------------------------------------------------------------------
 - Compatibility                                                                -
