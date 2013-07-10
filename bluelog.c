@@ -41,8 +41,8 @@
 #ifdef SQLITE
 #include <string.h>
 #include <sqlite3.h>
-#define TABLE "CREATE TABLE IF NOT EXISTS records(id INTEGER PRIMARY KEY, session_id INTEGER, mac VARCHAR(20), gathered_on DATETIME)"
-#define TABLE_EVENT "CREATE TABLE IF NOT EXISTS sessions(id INTEGER PRIMARY KEY, window integer, started_on DATETIME)"
+#define TABLE "CREATE TABLE IF NOT EXISTS record(id INTEGER PRIMARY KEY, session_id INTEGER, mac VARCHAR(20), gathered_on DATETIME)"
+#define TABLE_EVENT "CREATE TABLE IF NOT EXISTS session(id INTEGER PRIMARY KEY, window integer, started_on DATETIME)"
 #endif
 
 
@@ -634,7 +634,7 @@ int main(int argc, char *argv[])
 	// Open device and catch errors
 	bt_socket = hci_open_dev(device); 
 	if (device < 0 || bt_socket < 0) {
-		sprintf(stdio, "\n");	// Failed to open device, that can't be good
+		//sprintf(stdio, "\n");	// Failed to open device, that can't be good
 		exit(1);
 	}
 	
@@ -686,10 +686,10 @@ int main(int argc, char *argv[])
 		}
 		/* Log start time and parameters */
 		sSQL = malloc( 200 );
-		sprintf(sSQL, "INSERT INTO sessions VALUES (NULL, '%d', '%s')", scan_time, get_localtime() );
+		sprintf(sSQL, "INSERT INTO session VALUES (NULL, '%d', '%s')", scan_time, get_localtime() );
 		sqlite3_exec(db, sSQL, NULL, NULL, &zErrMsg);
 		session_id = sqlite3_last_insert_rowid(db);
-		sprintf(sSQL, "INSERT INTO records VALUES (NULL, '%ld', @sMAC, @sDATE)", session_id);
+		sprintf(sSQL, "INSERT INTO record VALUES (NULL, '%ld', @sMAC, @sDATE)", session_id);
 		//sSQL = "INSERT INTO records VALUES (NULL, @sMAC, @sDATE)";
 		rc = sqlite3_prepare_v2(db, sSQL, strlen(sSQL), &stmt, &tail);
 		if (rc) {
