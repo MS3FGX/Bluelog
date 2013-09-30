@@ -46,4 +46,6 @@ with con:
 	# Make a POST to send the last record
 	headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
 	r = requests.post( url_post, data=json.dumps(values), headers=headers )
-	print r.status_code #, r.url, r.text
+	if r.status_code == 200:
+		cur.execute("DELET FROM record WHERE gathered_on < :left_date", {'left_date': left_date.strftime('%m/%d/%y %H:%M:%S')})
+
