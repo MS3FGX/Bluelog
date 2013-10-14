@@ -312,6 +312,9 @@ projects on his site: http://www.hackfromacave.com/
 Bluelog also uses some code inspired by functions from pidfile.c by
 Martin Schulze.
 
+The font used for Bluelog Live's logo is "Electric Boots" by Jakob Fischer.
+You can see a collection of his fonts at: http://www.pizzadude.dk/
+
 The OpenWRT version of Bluelog would not have been possible without the work
 of Gary Bonner and the logistical support of Joshua Hurst and Dean Nielson.
 Thanks also to Stephen Walker, who maintains the official OpenWRT packages for
