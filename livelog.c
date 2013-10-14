@@ -203,9 +203,17 @@ void TopBar()
 
 void SideBar()
 {	
-	// Start sidebar, Info pane
-	puts("<div id=\"sidebar\">\n"\
-	"<div id=\"sideobject\">\n"\
+	// Start sidebar
+	puts("<div id=\"sidebar\">\n");
+	
+	// Aux pane
+	puts("<div id=\"sideobject\">\n"\
+	"<div id=\"auxbox1\">\n"\
+	"</div>\n"\
+	"</div>\n");
+	
+	// Start info pane
+	puts("<div id=\"sideobject\">\n"\
 	"<div id=\"boxheader\">Info</div>\n"\
 	"<div id=\"sidebox\">\n"\
 	"<div id=\"sidecontent\">");
@@ -213,7 +221,7 @@ void SideBar()
 	// Populate sidebar from files
 	print_info();
 	
-	// Close up info pane
+	// Close info pane
 	puts("</div>\n"\
 	"</div>\n"\
 	"</div>\n");
@@ -236,11 +244,19 @@ void SideBar()
 	puts("<div class=\"sideitem\">");
 	printf("Discovered Devices: %i</div>\n",device_index);
 	
-	// Close up info pane
+	// Close status pane
 	puts("</div>\n"\
 	"</div>\n"\
+	"</div>\n");
+	
+	// Aux pane
+	puts("<div id=\"sideobject\">\n"\
+	"<div id=\"auxbox2\">\n"\
 	"</div>\n"\
 	"</div>\n");
+	
+	// Close sidebar
+	puts("</div>\n");
 }
 
 void shut_down(void)
