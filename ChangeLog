@@ -1,6 +1,7 @@
 10/14/13:
 	Add support for additional CSS elements in Live UI
 	Add link to GitHub page in Live "About"
+	Merge in libmackerel 1.1
 	LCARS looking much better
 
 10/13/13:

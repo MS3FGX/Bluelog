@@ -5,7 +5,7 @@
  *  For more information, see: www.digifail.com
  */
 
-#define MACKERELVERSION "1.0"
+#define MACKERELVERSION "1.1"
 
 #include <time.h>
 #include <stdio.h>
@@ -173,6 +173,9 @@ char* mac_obfuscate (char* full_mac)
 		return("INVALID_MAC");
 		
 	static char addr_buffer[18] = {0};
+	
+	// Terminate to prevent duplicating previous results
+	memset(addr_buffer, '\0', sizeof(addr_buffer));
 	
 	// Copy half of full MAC into buffer
 	strncpy(addr_buffer, full_mac, 9);
