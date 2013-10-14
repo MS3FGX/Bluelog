@@ -28,9 +28,14 @@ h4, h4 a
 	/* Logo, can change in CSS without touching HTML */
 	background-image: url('images/lcars_head.png');
 	background-repeat: no-repeat;
-	height: 64px;
+	background-position: 90% 2%;
+	height: 39px;
 	text-indent: -9999px;
 	margin-bottom: 5px;
+	margin-top: 10px;
+	border-radius: 25px;
+	background-color: #FF9900;
+	-webkit-border-bottom-left-radius: 0;
 }
 
 /* Whole page goes in here */
@@ -63,6 +68,7 @@ h4, h4 a
 	background-color: #000000;
 	border: 8px solid #FFCC99;
 	padding: 10px;
+	margin-top: 5px;
 	/* This might not be standard compliant */
 	overflow-x: hidden;
 	overflow-y: auto;
