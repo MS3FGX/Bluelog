@@ -31,7 +31,6 @@ h4, h4 a
 	background-position: 90% 2%;
 	height: 39px;
 	text-indent: -9999px;
-	margin-bottom: 5px;
 	margin-top: 10px;
 	border-radius: 25px;
 	background-color: #FF9900;
@@ -51,11 +50,14 @@ h4, h4 a
 #container div.footer
 {
 	position: absolute;
-	bottom: 0;
+
 	height: 20px;
 	width: 100%;
-	background-color: #182842;
-	border-top: 1px solid  #FF9C27;
+	background-color: #FF9900;
+	margin-bottom: 10px;
+	border-radius: 25px;
+	-webkit-border-top-left-radius: 0;
+	/* Hide this until I can figure it out */
 	z-index: -1;
 }
 
@@ -68,7 +70,7 @@ h4, h4 a
 	background-color: #000000;
 	border: 8px solid #FFCC99;
 	padding: 10px;
-	margin-top: 5px;
+	margin-top: 10px;
 	/* This might not be standard compliant */
 	overflow-x: hidden;
 	overflow-y: auto;
@@ -87,6 +89,23 @@ h4, h4 a
 	/* Set margin against content here, makes Opera happy */
 	margin-right: 10px;
 	width: 200px;
+}
+
+/* Used for elbow inside */
+#auxbox1
+{
+	width: 209px;
+	height: 27px;
+	background-image: url('images/lcars_curve.png');
+	margin-bottom: 5px;
+	margin-top: -11px;
+}
+
+#auxbox2
+{
+	width: 200px;
+	height: 100%;
+	background-image: url('images/lcars_block.png');
 }
 
 #sidebox
