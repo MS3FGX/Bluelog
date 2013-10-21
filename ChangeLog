@@ -1,3 +1,6 @@
+10/20/13:
+	Add documentation for manufacturer lookups "-m"
+
 10/14/13:
 	Add support for additional CSS elements in Live UI
 	Add link to GitHub page in Live "About"
@@ -29,7 +32,7 @@
 03/30/13: Released as Version 1.1.1
 	Added "standalone" target to Makefile, kind of hacky
 	Removed SSI and Perl Bluelog Live modes, CGI is the future!
-	Bluelog Live can now display device manufacturer if launched with "-lm"
+	Bluelog Live can now display device manufacturer if launched with "-m"
 	Updated README.LIVE (needs improvement)
 
 03/27/13:

@@ -72,6 +72,13 @@ Finding the device name takes extra time during scanning, and occasionally
 fails. Therefore by not resolving device names, Bluelog can scan faster and
 more accurately. Default is disabled.
 .TP
+.B -m
+This option, if enabled in the build, performs hardware manufacturer lookups of
+discovered devices via the MAC OUI. The hardware manufacturer will be logged in
+the standard log file, as well as Bluelog Live. The manufacturer database needs
+to be installed for this function to work, which makes it prohibitively large
+for some platforms (such as OpenWRT).
+.TP
 .B -c
 This option toggles writing the raw device class to the log file. Enabling this
 option disables the -f option. Default is disabled.

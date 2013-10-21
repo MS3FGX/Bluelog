@@ -32,7 +32,8 @@ tested on x86, ARM, MIPS, and PowerPC processors.
 
 As of version 1.0.2, Bluelog is included in BackTrack Linux and the development
 version of OpenWRT. Build scripts for Bluelog are also available via the Arch
-Linux AUR community repository.
+Linux AUR community repository. Bluelog is also included on the Pwn Pad and Pwn
+Plug penetration testing devices from Pwnie Express.
 
 --------------------------------------------------------------------------------
 - Linux Kernel 3.0.x Bug                                                       -
@@ -180,6 +181,13 @@ See README.LIVE for more details.
 Finding the device name takes extra time during scanning, and occasionally
 fails. Therefore by not resolving device names, Bluelog can scan faster and
 more accurately. Default is disabled.
+
+-m
+    This option, if enabled in the build, performs hardware manufacturer
+lookups of discovered devices via the MAC OUI. The hardware manufacturer will
+be logged in the standard log file, as well as Bluelog Live. The manufacturer
+database needs to be installed for this function to work, which makes it
+prohibitively large for some platforms (such as OpenWRT).
 
 -q
    Turn off nonessential terminal output. In normal mode this means you will
