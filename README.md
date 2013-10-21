@@ -1,5 +1,5 @@
 <p align="center">
-![alt text](https://raw.github.com/MS3FGX/Bluelog/master/www/images/bluelog_logo.png "Bluelog Logo")
+<img src="https://raw.github.com/MS3FGX/Bluelog/master/www/images/bluelog_logo.png" />
 </p>
 
 Bluelog
