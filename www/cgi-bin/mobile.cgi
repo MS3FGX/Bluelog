@@ -1,3 +1,0 @@
-#!/bin/bash
-# This is sooo lame...
-./livelog.cgi -m
