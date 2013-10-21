@@ -27,7 +27,8 @@ h4, h4 a
 	/* Logo, can change in CSS without touching HTML */
 	background-image: url('images/bluelog_logo.png');
 	background-repeat: no-repeat;
-	background-position: 16px 10px;
+	background-position: 16px;
+	background-size: contain;
 	height: 80px;
 	/* Pushes DF logo to right side */
 	text-align: right;

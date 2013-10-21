@@ -89,6 +89,19 @@ h4, h4 a
 	width: 200px;
 }
 
+/*Undecided about the logo
+#auxbox1
+{
+	margin-top: 20px;
+	width: 200px;
+	height: 80px;
+	background-image: url('images/bluelog_logo.png');
+	background-position: center;
+	background-repeat: no-repeat;
+	background-size: contain;
+}
+*/
+
 #sidebox
 {
 	background-color: #171717;
