@@ -6,11 +6,12 @@ import sqlite3 as lite
 import sys
 import requests
 from datetime import datetime, timedelta
+from dateutil.tz import tzlocal
 import json
 
 url_get  = "http://ds.integreen-life.bz.it/odds/json"
 url_post = "http://ds.integreen-life.bz.it/odds/json"
-station_id = 13
+station_id = 15
 
 if len(sys.argv) != 2: 
 	print 'Sqlite db name required'
@@ -35,14 +36,14 @@ with con:
 		exit(1)
 	left_date = datetime.fromtimestamp( int(r.text)/1000 )
 	#print 'date', left_date
-
+	print left_date.strftime('%m/%d/%y %H:%M:%S')
 	# Query the local db to retrive the last records
 	#print 'Date ', left_date
 	cur.execute("SELECT * FROM record WHERE gathered_on > :left_date", {'left_date': left_date.strftime('%m/%d/%y %H:%M:%S')})
 	rows = cur.fetchall()
-
-	values = [ {'station_id': station_id, "local_id":row['id'], 'mac':row['mac'], 'gathered_on': datetime.strptime(row['gathered_on'],'%m/%d/%y %H:%M:%S').strftime('%Y-%m-%dT%H:%M:%S.000+02:00') } for row in rows]
-
+	timezone=datetime.now(tzlocal()).strftime('%z')
+	values = [ {'station_id': station_id, "local_id":row['id'], 'mac':row['mac'], 'gathered_on': datetime.strptime(row['gathered_on'],'%m/%d/%y %H:%M:%S').strftime('%Y-%m-%dT%H:%M:%S.000' + '%s' % timezone) } for row in rows]
+	#print len(values), values[-1]
 	# Make a POST to send the last record
 	headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
 	r = requests.post( url_post, data=json.dumps(values), headers=headers )
