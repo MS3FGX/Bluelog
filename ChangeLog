@@ -1,3 +1,7 @@
+10/29/13:
+	Minor Bluelog theme touchups
+	Add basic theming info to README.LIVE
+
 10/20/13:
 	Add documentation for manufacturer lookups "-m"
 	Higher resolution Bluelog logo, scale down in CSS for themes

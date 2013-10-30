@@ -50,6 +50,25 @@ the web page. Of course, their MAC is already being broadcast for everyone to
 see...but that is no reason we can't do the right thing.
 
 --------------------------------------------------------------------------------
+- Theming                                                                      -
+--------------------------------------------------------------------------------
+
+While Bluelog Live has a pretty simplistic interface, I've tried to leave it
+flexible enough that you can theme it for your event or organization with CSS.
+
+If you take a look at the www/ directory, you can see a number of CSS files
+which are included with Bluelog to serve as examples of the kind of things
+that are possible.
+
+In addition to the standard interface elements, there are also two additional
+CSS classes, "auxbox1" and "auxbox2", which appear above and below the status
+boxes, respectively.
+
+These can be used to add additional images or elements that are not present in
+the standard Bluelog Live layout. Check out the "LCARS" theme as an example of
+how these can be used.
+
+--------------------------------------------------------------------------------
 - Supported Browsers                                                           -
 --------------------------------------------------------------------------------
 
