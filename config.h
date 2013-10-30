@@ -1,5 +1,5 @@
 // Configuration file for Bluelog
-#define VERSION	"1.1.2-dev"
+#define VERSION	"1.1.2"
 #define APPNAME "Bluelog"
 
 // Generic 

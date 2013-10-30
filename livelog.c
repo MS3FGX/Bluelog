@@ -15,7 +15,7 @@
 
 // Defines
 #define APPNAME "livelog.cgi"
-#define VERSION "1.0"
+#define VERSION "1.1"
 #define MAXNUM 4096
 #define MAXLINE 500
 #define INFO "/tmp/info.txt"
