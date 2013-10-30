@@ -17,7 +17,7 @@ h4, h4 a
 	position: relative;
 	text-align: right;
 	margin-top: 4px;
-	right: 2px;
+	right: 8px;
 	font-size: 16px;
 	color: #0160b0;
 	text-decoration: none;
@@ -76,10 +76,7 @@ h4, h4 a
 }
 
 /* Keeps sidebar objects in their own area */
-#sidebar
-{
-	float: left;
-}
+#sidebar {float: left;}
 	
 /* Generic sidebar container */
 #sideobject
@@ -90,7 +87,7 @@ h4, h4 a
 }
 
 /*Undecided about the logo
-#auxbox1
+#auxbox2
 {
 	margin-top: 20px;
 	width: 200px;
@@ -141,19 +138,9 @@ h4, h4 a
 
 
 /* Table CSS */
-
-th
-{
-	color: #0160b0;
-	border: 0px;
-}
-
-td
-{
-	text-align: center;
-	font-size: 18px;
-}
-
+th {color: #0160b0; border: 0px;}
+tr:nth-child(even) {background-color: #2E2E2E;}
+td {text-align: center; font-size: 18px;}
 table {border: 0px;}
 
 /* Misc */
