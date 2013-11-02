@@ -356,8 +356,9 @@ int main(int argc, char *argv[])
 	#endif
 
 	// Read in environment variable
-	char* env_string;
-	env_string=getenv("QUERY_STRING");
+	// Comment this to fix compiler warning until ready to implement
+	//char* env_string;
+	//env_string=getenv("QUERY_STRING");
 
 	// Print HTML head
 	print_header(CSSFILE);

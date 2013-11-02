@@ -1,3 +1,6 @@
+11/01/13: Released as Version 1.1.2
+	Fix compiler warning for stable release. I'll break that later.
+
 10/29/13:
 	Minor Bluelog theme touchups
 	Add basic theming info to README.LIVE
