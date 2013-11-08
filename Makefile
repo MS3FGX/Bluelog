@@ -1,6 +1,6 @@
 # App info
 APPNAME = bluelog
-VERSION = 1.1.2
+VERSION = 1.1.3-dev
 
 # Determines which CSS theme to use as default
 # Options: bluelog.css digifail.css, backtrack.css, pwnplug.css, openwrt.css, lcars.css
