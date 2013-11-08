@@ -56,6 +56,7 @@
 #define LIVEMODE 1
 #define OUILOOKUP 1
 #define OUT_PATH ""
+#define CFG_FILE "bluelog.cfg"
 #define LIVE_OUT "/tmp/live.log"
 #define LIVE_INF "/tmp/info.txt"
 #define PID_FILE "/tmp/bluelog.pid"

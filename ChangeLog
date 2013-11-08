@@ -1,3 +1,8 @@
+11/08/13:
+	Merged in experimental config file support.
+	Not all options are yet supported in config file, but seems to be
+	working. Any testing would be appreciated.
+
 11/01/13: Released as Version 1.1.2
 	Fix compiler warning for stable release. I'll break that later.
 

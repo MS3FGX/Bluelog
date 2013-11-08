@@ -39,6 +39,7 @@
 // Bluelog-specific includes
 #include "classes.c"
 #include "libmackerel.c"
+#include "readconfig.c"
 
 // Found device struct
 struct btdev
@@ -59,10 +60,6 @@ struct btdev
 FILE *outfile; // Output file
 FILE *infofile; // Status file
 inquiry_info *results; // BlueZ scan results struct
-int bt_socket; // HCI device
-int showtime = 0; // Show timestamps in log		
-int quiet = 0; // Print output normally
-int getmanufacturer = 0; // OUI lookups
 			
 struct btdev dev_cache[MAX_DEV]; // Init device cache
 
@@ -107,7 +104,7 @@ void shut_down(int sig)
 	printf("\n");
 	printf("Closing files and freeing memory...");
 	// Only show this if timestamps are enabled
-	if (showtime)
+	if (config.showtime)
 		fprintf(outfile,"[%s] Scan ended.\n", get_localtime());
 	
 	// Don't try to close a file that doesn't exist, kernel gets mad
@@ -115,7 +112,7 @@ void shut_down(int sig)
 		fclose(outfile);
 	
 	free(results);
-	close(bt_socket);
+	close(config.bt_socket);
 	// Delete PID file
 	unlink(PID_FILE);
 	printf("Done!\n");
@@ -151,7 +148,7 @@ void live_entry(int index)
 	fprintf(outfile,"%s,", local_class);
 	
 	// Last field is variable
-	if (getmanufacturer)
+	if (config.getmanufacturer)
 		fprintf(outfile,"%s", mac_get_vendor(dev_cache[index].addr));
 	else
 		fprintf(outfile,"%s", local_capabilities);
@@ -180,7 +177,7 @@ static void write_pid (pid_t pid)
 	FILE *pid_file;
 	
 	// Open PID file
-	if (!quiet)
+	if (!config.quiet)
 		printf("Writing PID file: %s...", PID_FILE);
 	if ((pid_file = fopen(PID_FILE,"w")) == NULL)
 	{
@@ -188,7 +185,7 @@ static void write_pid (pid_t pid)
 		printf("Error opening PID file!\n");
 		exit(1);
 	}
-	if (!quiet)	
+	if (!config.quiet)	
 		printf("OK\n");
 	
 	// If open, write PID and close	
@@ -225,7 +222,7 @@ static void daemonize (void)
 	// Write PID file
 	write_pid(sid);
 	
-	if (!quiet)
+	if (!config.quiet)
 		printf("Going into background...\n");
 		
 	// Close file descriptors
@@ -243,7 +240,7 @@ char* namequery (const bdaddr_t *addr)
 	memset(name, 0, sizeof(name));
 	
 	// Attempt to read device name
-	if (hci_read_remote_name(bt_socket, addr, sizeof(name), name, 0) < 0) 
+	if (hci_read_remote_name(config.bt_socket, addr, sizeof(name), name, 0) < 0) 
 		strcpy(name, "VOID");
 		
 	return (name);
@@ -374,20 +371,6 @@ int main(int argc, char *argv[])
 	// Process ID read from PID file
 	int ext_pid;
 	
-	// Settings
-	int retry_count = 0;
-	int verbose = 0;
-	int obfuscate = 0;
-	int showclass = 0;
-	int friendlyclass = 0;
-	int bluelive = 0;
-	int daemon = 0;
-	int bluepropro = 0;
-	int getname = 0;
-	int amnesia = -1;
-	int syslogonly = 0;
-	int encode = 0;
-	
 	// Pointers to filenames
 	char *infofilename = LIVE_INF;
 	
@@ -429,37 +412,37 @@ int main(int argc, char *argv[])
 			outfilename = strdup(optarg);
 			break;
 		case 'r':
-			retry_count = atoi(optarg);
+			config.retry_count = atoi(optarg);
 			break;
 		case 'a':
-			amnesia = atoi(optarg);
+			config.amnesia = atoi(optarg);
 			break;	
 		case 'w':
-			scan_window = round((atoi(optarg) / 1.28));
+			config.scan_window = round((atoi(optarg) / 1.28));
 			break;	
 		case 'c':
-			showclass = 1;
+			config.showclass = 1;
 			break;
 		case 'e':
-			encode = 1;
+			config.encode = 1;
 			break;			
 		case 'f':
-			friendlyclass = 1;
+			config.friendlyclass = 1;
 			break;
 		case 'v':
-			verbose = 1;
+			config.verbose = 1;
 			break;
 		case 't':
-			showtime = 1;
+			config.showtime = 1;
 			break;
 		case 's':
-			syslogonly = 1;
+			config.syslogonly = 1;
 			break;
 		case 'x':
-			obfuscate = 1;
+			config.obfuscate = 1;
 			break;
 		case 'q':
-			quiet = 1;
+			config.quiet = 1;
 			break;			
 		case 'l':
 			if(!LIVEMODE)
@@ -468,16 +451,16 @@ int main(int argc, char *argv[])
 				exit(0);
 			}
 			else
-				bluelive = 1;
+				config.bluelive = 1;
 			break;
 		case 'b':
-			bluepropro = 1;
+			config.bluepropro = 1;
 			break;
 		case 'd':
-			daemon = 1;
+			config.daemon = 1;
 			break;
 		case 'n':
-			getname = 1;
+			config.getname = 1;
 			break;
 		case 'm':
 			if(!OUILOOKUP)
@@ -486,7 +469,7 @@ int main(int argc, char *argv[])
 				exit(0);
 			}
 			else
-				getmanufacturer = 1;
+				config.getmanufacturer = 1;
 			break;
 		case 'h':
 			help();
@@ -526,72 +509,14 @@ int main(int argc, char *argv[])
 		printf("Use the -k option to kill a running Bluelog process.\n");
 		exit(1);
 	}
-	
-	// Sanity checks
-	if ((retry_count < 0) || ((amnesia < 0) && (amnesia != -1)))
-	{	
-		printf("Error, arguments must be positive numbers!\n");
-		exit(1);
-	}
-	
-	// Make sure window is reasonable
-	if (scan_window > MAX_SCAN || scan_window < MIN_SCAN)
-	{
-		printf("Scan window is out of range. See README.\n");
-		exit(1);
-	}	
-	
-	// Override some options that don't play nice with others
-	// If retry is set, assume names are on. Default retry value
-	if (retry_count > 0)
-		getname = 1;
-	else
-		retry_count = 3;
-	
-	// No verbose for daemon
-	if (daemon)
-		verbose = 0;
-		
-	// No Bluelog Live when running BPP, names on, syslog off
-	if (bluepropro)
-	{
-		bluelive = 0;
-		getname = 1;
-		syslogonly = 0;
-	}
 
-	// Showing raw class ID turns off friendly names
-	if (showclass)
-		friendlyclass = 0;
-			
-	// No timestamps for Bluelog Live, names on, syslog off
-	if (bluelive)
-	{
-		showtime = 0;
-		getname = 1;
-		syslogonly = 0;
-	}
-	
-	// No timestamps in syslog mode, disable other modes
-	if (syslogonly)
-	{
-		showtime = 0;
-		bluelive = 0;
-		bluepropro = 0;
-	}
-	
-	// Encode trumps obfuscate
-	if (encode)
-		obfuscate = 0;
-	
 	// Setup libmackerel
-	mac_init();
-
+	mac_init();	
+	
 	// Boilerplate
-	if (!quiet)
+	if (!config.quiet)
 	{
 		printf("%s (v%s%s) by MS3FGX\n", APPNAME, VERSION, VER_MOD);
-		// That's right, this kind of thing bothers me. Problem?
 		#if defined OPENWRT || PWNPLUG
 			printf("----");
 		#endif
@@ -602,7 +527,7 @@ int main(int argc, char *argv[])
 	ba2str(&bdaddr, addr);
 	if (!strcmp(addr, "00:00:00:00:00:00"))
 	{
-		if (!quiet)
+		if (!config.quiet)
 			printf("Autodetecting device...");
 		device = hci_get_route(NULL);
 		// Put autodetected device MAC into addr
@@ -611,14 +536,14 @@ int main(int argc, char *argv[])
 	}
 	else
 	{
-		if (!quiet)
+		if (!config.quiet)
 			printf("Initializing device...");
 		device = hci_devid(addr);
 	}
 	
 	// Open device and catch errors
-	bt_socket = hci_open_dev(device); 
-	if (device < 0 || bt_socket < 0)
+	config.bt_socket = hci_open_dev(device); 
+	if (device < 0 || config.bt_socket < 0)
 	{
 		// Failed to open device, that can't be good
 		printf("\n");
@@ -626,27 +551,34 @@ int main(int argc, char *argv[])
 		exit(1);
 	}
 	// If we get here the device should be online.
-	if (!quiet)
+	if (!config.quiet)
 		printf("OK\n");
 	
+	// See if we should use config file
+	if(cfg_exists() && argc == 1)
+		cfg_read();
+		
+	// Perform sanity checks on varibles
+	cfg_check();
+
 	// Status message for BPP
-	if (!quiet)
-		if (bluepropro)
+	if (!config.quiet)
+		if (config.bluepropro)
 			printf("Output formatted for BlueProPro.\n"
 				   "More Info: www.hackfromacave.com\n");
 	
 	// Open output file
-	if (!syslogonly)
+	if (!config.syslogonly)
 	{
-		if (bluelive)
+		if (config.bluelive)
 		{
 			// Change location of output file
 			outfilename = LIVE_OUT;
 			filemode = "w";
-			if (!quiet)
+			if (!config.quiet)
 				printf("Starting Bluelog Live...\n");
 		}
-		if (!quiet)		
+		if (!config.quiet)		
 			printf("Opening output file: %s...", outfilename);
 		if ((outfile = fopen(outfilename, filemode)) == NULL)
 		{
@@ -654,19 +586,19 @@ int main(int argc, char *argv[])
 			printf("Error opening output file!\n");
 			exit(1);
 		}
-		if (!quiet)
+		if (!config.quiet)
 			printf("OK\n");
 	}
 	else
 	{
-		if (!quiet)
+		if (!config.quiet)
 			printf("In syslog mode, log file disabled.\n");
 	}
 	
 	// Open status file
-	if (bluelive)
+	if (config.bluelive)
 	{
-		if (!quiet)		
+		if (!config.quiet)		
 			printf("Opening info file: %s...", infofilename);
 		if ((infofile = fopen(infofilename,"w")) == NULL)
 		{
@@ -674,21 +606,21 @@ int main(int argc, char *argv[])
 			printf("Error opening info file!\n");
 			exit(1);
 		}
-		if (!quiet)
+		if (!config.quiet)
 			printf("OK\n");
 	}
 	
 	// Write PID file
-	if (!daemon)
+	if (!config.daemon)
 		write_pid(getpid());
 	
 	// Get and print time to console and file
 	strcpy(cur_time, get_localtime());
 		
-	if (!daemon)
+	if (!config.daemon)
 		printf("Scan started at [%s] on %s.\n", cur_time, addr);
 	
-	if (showtime)
+	if (config.showtime)
 	{
 		fprintf(outfile,"[%s] Scan started on %s\n", cur_time, addr);
 		// Make sure this gets written out
@@ -696,7 +628,7 @@ int main(int argc, char *argv[])
 	}
 		
 	// Write info file for Bluelog Live
-	if (bluelive)
+	if (config.bluelive)
 	{
 		fprintf(infofile,"<div class=\"sideitem\">%s Version: %s%s</div>\n", APPNAME, VERSION, VER_MOD);
 		fprintf(infofile,"<div class=\"sideitem\">Device: %s</div>\n", addr);
@@ -710,10 +642,10 @@ int main(int argc, char *argv[])
 	syslog(LOG_INFO,"Init OK!");
 	
 	// Daemon switch
-	if (daemon)
+	if (config.daemon)
 		daemonize();
 	else
-		if (!quiet)
+		if (!config.quiet)
 			#if defined PWNPAD
 			printf("Close this window to end scan.\n");
 			#else
@@ -806,12 +738,12 @@ int main(int argc, char *argv[])
 					strcpy(dev_cache[ri].time, get_localtime());
 					
 					// If we don't have a name, query again
-					if ((dev_cache[ri].print == 3) && (dev_cache[ri].seen > retry_count))
+					if ((dev_cache[ri].print == 3) && (dev_cache[ri].seen > config.retry_count))
 					{
 						syslog(LOG_INFO,"Unable to find name for %s!", addr);
 						dev_cache[ri].print = 1;
 					}
-					else if ((dev_cache[ri].print == 3) && (dev_cache[ri].seen < retry_count))
+					else if ((dev_cache[ri].print == 3) && (dev_cache[ri].seen < config.retry_count))
 					{
 						// Query name
 						strcpy(dev_cache[ri].name, namequery(&(results+i)->bdaddr));
@@ -828,11 +760,11 @@ int main(int argc, char *argv[])
 					}
 					
 					// Amnesia mode
-					if (amnesia >= 0)
+					if (config.amnesia >= 0)
 					{
 						// Find current epoch time
 						epoch = time(NULL);
-						if ((epoch - dev_cache[ri].epoch) >= (amnesia * 60))
+						if ((epoch - dev_cache[ri].epoch) >= (config.amnesia * 60))
 						{
 							// Update epoch time
 							dev_cache[ri].epoch = epoch;
@@ -851,7 +783,7 @@ int main(int argc, char *argv[])
 					strcpy(dev_cache[ri].addr, addr);
 					
 					// Query for name
-					if (getname)
+					if (config.getname)
 						strcpy(dev_cache[ri].name, namequery(&(results+i)->bdaddr));
 					else
 						strcpy(dev_cache[ri].name, "IGNORED");
@@ -888,7 +820,7 @@ int main(int argc, char *argv[])
 				if (dev_cache[ri].print == 1) 
 				{	
 					// Encode MAC
-					if (encode || obfuscate)
+					if (config.encode || config.obfuscate)
 					{
 						// Clear buffer
 						memset(addr_buff, '\0', sizeof(addr_buff));
@@ -896,10 +828,10 @@ int main(int argc, char *argv[])
 						// Preserve real MAC
 						strcpy(dev_cache[ri].priv_addr, dev_cache[ri].addr);
 
-						if (obfuscate)
+						if (config.obfuscate)
 							strcpy(addr_buff, mac_obfuscate(dev_cache[ri].addr));
 						
-						if (encode)
+						if (config.encode)
 							strcpy(addr_buff, mac_encode(dev_cache[ri].addr));
 
 						// Copy to cache
@@ -907,9 +839,9 @@ int main(int argc, char *argv[])
 					}
 					
 					// Print everything to console if verbose is on, optionally friendly class info
-					if (verbose)
+					if (config.verbose)
 					{
-						if (friendlyclass)
+						if (config.friendlyclass)
 						{
 							printf("[%s] %s,%s,%s,(%s)\n",\
 								dev_cache[ri].time, dev_cache[ri].addr,\
@@ -925,12 +857,12 @@ int main(int argc, char *argv[])
 						}
 					}
 											
-					if (bluelive)
+					if (config.bluelive)
 					{
 						// Write result with live function
 						live_entry(ri);
 					}
-					else if (bluepropro)
+					else if (config.bluepropro)
 					{
 						// Set output format for BlueProPro
 						fprintf(outfile,"%s", dev_cache[ri].addr);
@@ -944,33 +876,33 @@ int main(int argc, char *argv[])
 						memset(outbuffer, 0, sizeof(outbuffer));
 						
 						// Print time first if enabled
-						if (showtime)
+						if (config.showtime)
 							sprintf(outbuffer,"[%s],", dev_cache[ri].time);
 							
 						// Always output MAC
 						sprintf(outbuffer+strlen(outbuffer),"%s", dev_cache[ri].addr);
 						
 						// Optionally output class
-						if (showclass)					
+						if (config.showclass)					
 							sprintf(outbuffer+strlen(outbuffer),",0x%02x%02x%02x", dev_cache[ri].flags,\
 							dev_cache[ri].major_class, dev_cache[ri].minor_class);
 							
 						// "Friendly" version of class info
-						if (friendlyclass)					
+						if (config.friendlyclass)					
 							sprintf(outbuffer+strlen(outbuffer),",%s,(%s)",\
 							device_class(dev_cache[ri].major_class, dev_cache[ri].minor_class),\
 							device_capability(dev_cache[ri].flags));
 						
 						// Get manufacturer
-						if (getmanufacturer)
+						if (config.getmanufacturer)
 							sprintf(outbuffer+strlen(outbuffer),",%s", mac_get_vendor(dev_cache[ri].addr));
 							
 						// Append the name
-						if (getname)
+						if (config.getname)
 							sprintf(outbuffer+strlen(outbuffer),",%s", dev_cache[ri].name);
 													
 						// Send buffer, else file. File needs newline
-						if (syslogonly)
+						if (config.syslogonly)
 							syslog(LOG_INFO,"%s", outbuffer);
 						else
 							fprintf(outfile,"%s\n",outbuffer);
@@ -981,7 +913,7 @@ int main(int argc, char *argv[])
 				// If we make it this far, it means we will check next stored device
 			}
 			// Write any new changes
-			if (!syslogonly)
+			if (!config.syslogonly)
 				fflush(outfile);
 		}
 	}
