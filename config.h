@@ -56,11 +56,11 @@
 #define LIVEMODE 1
 #define OUILOOKUP 1
 #define OUT_PATH ""
-#define CFG_FILE "bluelog.cfg"
 #define LIVE_OUT "/tmp/live.log"
 #define LIVE_INF "/tmp/info.txt"
 #define PID_FILE "/tmp/bluelog.pid"
-#define OUIFILE "/usr/share/bluelog/oui.txt"
+#define OUIFILE "/etc/bluelog/oui.txt"
+#define CFG_FILE "/etc/bluelog/bluelog.conf"
 #endif
 
 // These override the platform-specific options.

@@ -1,3 +1,8 @@
+11/09/13:
+	Created default bluelog.conf file
+	Makefile updated to create /etc/bluelog
+	oui.txt moved to /etc/bluelog
+
 11/08/13:
 	Merged in experimental config file support.
 	Not all options are yet supported in config file, but seems to be
