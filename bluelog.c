@@ -50,41 +50,20 @@
 // OpenWRT specific
 #ifdef OPENWRT
 #define VER_MOD "-WRT"
-// Maximum number of devices in cache
-#define MAX_DEV 200
-// Toggle Bluelog Live
-#define LIVEMODE 1
-// Default log
 #define OUT_PATH "/tmp/"
-// Bluelog Live device list
-#define LIVE_OUT "/tmp/live.log"
-// Bluelog Live status info
-#define LIVE_INF "/tmp/info.txt"
-// PID storage
-#define PID_FILE "/tmp/bluelog.pid"
+
 // PWNPLUG specific
 #elif PWNPLUG
 #define VER_MOD "-PWN"
-#define MAX_DEV 200
-#define LIVEMODE 1
 #define OUT_PATH "/dev/shm/"
-#define LIVE_OUT "/tmp/live.log"
-#define LIVE_INF "/tmp/info.txt"
-#define PID_FILE "/tmp/bluelog.pid"
 #else
 // Generic x86
 #define VER_MOD ""
-#define MAX_DEV 200
-#define LIVEMODE 1
 #define OUT_PATH ""
-#define LIVE_OUT "/tmp/live.log"
-#define LIVE_INF "/tmp/info.txt"
-#define PID_FILE "/tmp/bluelog.pid"
 #endif
-
+#define PID_FILE "/tmp/bluelog.pid"
 // Found device struct
-struct btdev
-{
+struct btdev {
 	char name[248];
 	char addr[18];
 	char priv_addr[18];
@@ -92,15 +71,11 @@ struct btdev
 	uint8_t flags;
 	uint8_t major_class;
 	uint8_t minor_class;
-	uint8_t seen;
 };
 
 // Global variables
 FILE *outfile; // Output file
-#ifdef SQLITE	/* Database variable */
 sqlite3 *db;
-#endif
-FILE *infofile; // Status file
 inquiry_info *results; // BlueZ scan results struct
 int bt_socket; // HCI device
 int showtime = 0; // Show timestamps in log		
@@ -273,15 +248,6 @@ static void help(void)
 		"system unattended for long periods of time to collect data.\n");
 	printf("\n");
 	
-	// Only print this if Bluelog Live is enabled in build
-	if (LIVEMODE)
-	{
-		printf("Bluelog also includes a mode called \"Bluelog Live\" which creates a\n"
-			"webpage of the results that you can serve up with your HTTP daemon of\n"
-			"choice. See the \"README.LIVE\" file for details.\n");
-		printf("\n");
-	}
-	
 	printf("For more information, see: www.digifail.com\n");
 	printf("\n");
 	printf("Basic Options:\n"
@@ -292,10 +258,6 @@ static void help(void)
 		"\t-d                 Enables daemon mode, Bluelog will run in background\n"
 		"\t-k                 Kill an already running Bluelog process\n");
 		
-	// Only print this if Bluelog Live is enabled in build
-	if (LIVEMODE)
-		printf("\t-l                 Start \"Bluelog Live\", default is disabled\n");
-	
 	printf("\n");
 	printf("Logging Options:\n"		
 		"\t-n                 Write device names to log, default is disabled\n"
@@ -307,8 +269,6 @@ static void help(void)
 
 	printf("\n");
 	printf("Advanced Options:\n"			
-		"\t-r <retries>       Name resolution retries, default is 3\n"
-		"\t-a <minutes>       Amnesia, Bluelog will forget device after given time\n"
 		"\t-s                 Syslog only mode, no log file. Default is disabled\n"
 		"\n");
 }
@@ -333,8 +293,7 @@ static struct option main_options[] = {
 	{ 0, 0, 0, 0 }
 };
 
-int main(int argc, char *argv[])
-{	
+int main(int argc, char *argv[]) {	
 	// Handle signals
 	signal(SIGINT,shut_down);
 	signal(SIGHUP,shut_down);
@@ -394,9 +353,6 @@ int main(int argc, char *argv[])
 	int bluepropro = 0;
 	int getname = 0;
 		
-	// Pointers to filenames
-	char *infofilename = LIVE_INF;
-	
 	// Change default filename based on date
 	char OUT_FILE[1000] = OUT_PATH;
 	strncat(OUT_FILE, file_timestamp(),sizeof(OUT_FILE)-strlen(OUT_FILE)-1);	
@@ -418,80 +374,79 @@ int main(int argc, char *argv[])
 	struct utsname sysinfo;
 	uname(&sysinfo);
 	
-	while ((opt=getopt_long(argc,argv,"+o:i:r:a:w:vxcthldbfnksq", main_options, NULL)) != EOF)
-	{
-		switch (opt)
-		{
-		case 'i':
-			if (!strncasecmp(optarg, "hci", 3))
-				hci_devba(atoi(optarg + 3), &bdaddr);
-			else
-				str2ba(optarg, &bdaddr);
-			break;
-		case 'o':
-			outfilename = strdup(optarg);
-			break;
-		case 'w':
-			scan_time =  atoi(optarg);
-			break;
-		case 'c':
-			showclass = 1;
-			break;
-		case 'f':
-			friendlyclass = 1;
-			break;
-		case 'v':
-			verbose = 1;
-			break;
-		case 't':
-			showtime = 1;
-			break;
-		case 's':
-			syslogonly = 1;
-			break;
-		case 'x':
-			obfuscate = 1;
-			break;
-		case 'q':
-			quiet = 1;
-			break;			
-		case 'b':
-			bluepropro = 1;
-			break;
-		case 'd':
-			daemon = 1;
-			break;
-		case 'n':
-			getname = 1;
-			break;
-		case 'h':
-			help();
-			exit(0);
-		case 'k':
-			// Read PID from file into variable
-			ext_pid = read_pid();
-			if (ext_pid != 0)
-			{
-				printf("Killing Bluelog process with PID %i...",ext_pid);
-				if(kill(ext_pid,15) != 0)
-				{
-					printf("ERROR!\n");
-					printf("Unable to kill Bluelog process. Check permissions.\n");
-					exit(1);
-				}
-				else
-					printf("OK.\n");
+	while ((opt=getopt_long(argc,argv,"+o:i:r:a:w:vxcthldbfnksq", main_options, NULL)) != EOF) {
+		switch (opt) {
+  
+		    case 'i':
+			    if (!strncasecmp(optarg, "hci", 3))
+				    hci_devba(atoi(optarg + 3), &bdaddr);
+			    else
+				    str2ba(optarg, &bdaddr);
+			    break;
+		    case 'o':
+			    outfilename = strdup(optarg);
+			    break;
+		    case 'w':
+			    scan_time =  atoi(optarg);
+			    break;
+		    case 'c':
+			    showclass = 1;
+			    break;
+		    case 'f':
+			    friendlyclass = 1;
+			    break;
+		    case 'v':
+			    verbose = 1;
+			    break;
+		    case 't':
+			    showtime = 1;
+			    break;
+		    case 's':
+			    syslogonly = 1;
+			    break;
+		    case 'x':
+			    obfuscate = 1;
+			    break;
+		    case 'q':
+			    quiet = 1;
+			    break;			
+		    case 'b':
+			    bluepropro = 1;
+			    break;
+		    case 'd':
+			    daemon = 1;
+			    break;
+		    case 'n':
+			    getname = 1;
+			    break;
+		    case 'h':
+			    help();
+			    exit(0);
+		    case 'k':
+			    // Read PID from file into variable
+			    ext_pid = read_pid();
+			    if (ext_pid != 0)
+			    {
+				    printf("Killing Bluelog process with PID %i...",ext_pid);
+				    if(kill(ext_pid,15) != 0)
+				    {
+					    printf("ERROR!\n");
+					    printf("Unable to kill Bluelog process. Check permissions.\n");
+					    exit(1);
+				    }
+				    else
+					    printf("OK.\n");
 				
-				// Delete PID file
-				unlink(PID_FILE);
-			}
-			else
-				printf("No running Bluelog process found.\n");
+				    // Delete PID file
+				    unlink(PID_FILE);
+			    }
+			    else
+				    printf("No running Bluelog process found.\n");
 				
-			exit(0);
-		default:
-			printf("Unknown option. Use -h for help, or see README.\n");
-			exit(1);
+			    exit(0);
+		    default:
+			    printf("Unknown option. Use -h for help, or see README.\n");
+			    exit(1);
 		}
 	}
 	
@@ -581,7 +536,6 @@ int main(int argc, char *argv[])
 			printf("Error opening output file!\n");
 			exit(1);
 		}
-		#ifdef SQLITE
 		/* Open and manage SQLITE database */
 		db_name = malloc(snprintf(NULL, 0, "%s.db", outfilename) + 1);
 		sprintf(db_name, "%s.db", outfilename);
@@ -622,7 +576,7 @@ int main(int argc, char *argv[])
 		}
 		
 		printf("Sqlite statement ready\n");
-		#endif
+
 		if (!quiet)
 			printf("OK\n");
 	}
@@ -679,8 +633,7 @@ int main(int argc, char *argv[])
 	results = (inquiry_info*)malloc(max_results * sizeof(inquiry_info));
 
 	// Seamless loop
-	for(;;)
-	{
+	for(;;) {
 		memset( results, '\0', max_results * sizeof(inquiry_info) ); 
 		// Scan and return number of results
 		num_results = hci_inquiry(device, scan_time, max_results, NULL, &results, flags);
@@ -721,9 +674,7 @@ int main(int argc, char *argv[])
 		*  turn; wrapping a sequence of insert by a single transaction makes
 		*  inserts faster rather than a transaction for each insert (default)
 		*/
-		#ifdef SQLITE
 		sqlite3_exec(db, "BEGIN TRANSACTION", NULL, NULL, &zErrMsg);	
-		#endif
 		// Loop through results
 		for (i = 0; i < num_results; i++) {	
 			// Return current MAC from struct
@@ -792,12 +743,12 @@ int main(int argc, char *argv[])
 					syslog(LOG_INFO,"Found new device: %s",new_device.addr);
 			
 			// Print everything to console if verbose is on
-			if (verbose)
+			if (verbose) {
 				printf("[%s] %s,%s,0x%02x%02x%02x\n",\
 				new_device.time, new_device.addr,\
 				new_device.name, new_device.flags,\
 				new_device.major_class, new_device.minor_class);
-									
+			}		
             if (bluepropro) {
 				// Set output format for BlueProPro
 				fprintf(outfile,"%s", new_device.addr);
