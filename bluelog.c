@@ -38,12 +38,12 @@
 #define VERSION	"1.0.5-RC1"
 #define APPNAME "Bluelog"
 
-#ifdef SQLITE
 #include <string.h>
 #include <sqlite3.h>
 #define TABLE "CREATE TABLE IF NOT EXISTS record(id INTEGER PRIMARY KEY, session_id INTEGER, mac VARCHAR(20), gathered_on DATETIME)"
 #define TABLE_EVENT "CREATE TABLE IF NOT EXISTS session(id INTEGER PRIMARY KEY, window integer, started_on DATETIME)"
-#endif
+#define INDEX_MAC "CREATE INDEX IF NOT EXISTS `index_mac` ON record (`mac`)"
+#define INDEX_DATE "CREATE INDEX IF NOT EXISTS `index_date` ON record (`gathered_on`)"
 
 
 // Determine device-specific configs
@@ -89,11 +89,9 @@ struct btdev
 	char addr[18];
 	char priv_addr[18];
 	char time[20];
-	uint64_t epoch;
 	uint8_t flags;
 	uint8_t major_class;
 	uint8_t minor_class;
-	uint8_t print;
 	uint8_t seen;
 };
 
@@ -109,23 +107,26 @@ int showtime = 0; // Show timestamps in log
 int syslogonly = 0; // Log file enabled
 int quiet = 0; // Print output normally
 			
-struct btdev dev_cache[MAX_DEV]; // Init device cache
+struct btdev new_device; 
 
-char* get_localtime()
+char* get_localtime(int diff_seconds)
 {
 	// Time variables
-	time_t rawtime;
+	time_t now, diff;
 	struct tm * timeinfo;
 	static char time_string[20];
 	
 	// Find time and put it into time_string
-	time (&rawtime);
-	timeinfo = localtime(&rawtime);
+	now = time (0);
+	diff= now - diff_seconds; 
+	timeinfo = localtime(&diff);
 	strftime(time_string,20,"%D %T",timeinfo);
 	
 	// Send it back
 	return(time_string);
 }
+
+
 
 char* file_timestamp()
 {
@@ -153,7 +154,7 @@ void shut_down(int sig)
 	printf("Closing files and freeing memory...");
 	// Only show this if timestamps are enabled
 	if (showtime)
-		fprintf(outfile,"[%s] Scan ended.\n", get_localtime());
+		fprintf(outfile,"[%s] Scan ended.\n", get_localtime(0));
 	
 	// Don't try to close a file that doesn't exist, kernel gets mad
 	if (!syslogonly) {
@@ -171,36 +172,6 @@ void shut_down(int sig)
 	// Log shutdown to syslog
 	syslog(LOG_INFO, "Shutdown OK.");
 	exit(sig);
-}
-
-void live_entry (int index)
-{
-	// Local variables 
-	char local_name[248];
-	char local_class[64];
-	char local_capabilities[64];
-	
-	//Populate the local variables
-	strcpy(local_name, dev_cache[index].name);
-	strcpy(local_class, device_class(dev_cache[index].major_class, dev_cache[index].minor_class));
-	strcpy(local_capabilities, device_capability(dev_cache[index].flags));
-		
-	// Let's format these a little nicer
-	if (!strcmp(local_name, "VOID"))
-		strcpy(local_name, "No Response");
-	if (!strcmp(local_class, "VOID"))
-		strcpy(local_class, "Unclassified");
-	if (!strcmp(local_capabilities, "VOID"))
-		strcpy(local_capabilities, "Not Reported");
-		
-	// Write out HTML code
-	fprintf(outfile,"<tr>");
-	fprintf(outfile,"<td>%s</td>", dev_cache[index].time);
-	fprintf(outfile,"<td>%s</td>", dev_cache[index].addr);
-	fprintf(outfile,"<td>%s</td>", local_name);
-	fprintf(outfile,"<td>%s</td>", local_class);
-	fprintf(outfile,"<td>%s</td>", local_capabilities);
-	fprintf(outfile,"</tr>\n");
 }
 
 int read_pid (void)
@@ -390,21 +361,20 @@ int main(int argc, char *argv[])
 	/* Database variables */
 	sqlite3 *db;
 	sqlite3_stmt * stmt;
+	sqlite3_stmt * query;
 	char *zErrMsg = 0;
 	const char * tail = 0;
 	int rc;
 	long int session_id;
 	char * sSQL = 0;
+	char * qSQL = 0;
 	char * db_name = 0;
 	#endif
 	// Maximum number of devices per scan
 	int max_results = 255;
 	int num_results;
 	
-	// Device cache and index
-	int cache_index = 0;
-
-	// HCI cache setting
+    // HCI cache setting
 	int flags = IREQ_CACHE_FLUSH;
 	
 	// Strings to hold MAC and name
@@ -418,7 +388,6 @@ int main(int argc, char *argv[])
 	int ext_pid;
 	
 	// Settings
-	int retry_count = 0;
 	int verbose = 0;
 	int obfuscate = 0;
 	int showclass = 0;
@@ -427,7 +396,6 @@ int main(int argc, char *argv[])
 	int daemon = 0;
 	int bluepropro = 0;
 	int getname = 0;
-	int amnesia = 0;
 		
 	// Pointers to filenames
 	char *infofilename = LIVE_INF;
@@ -444,13 +412,10 @@ int main(int argc, char *argv[])
 	char outbuffer[500];
 	
 	// Misc Variables
-	int i, ri, opt;
+	int i, opt;
 	
 	// Record numbner of BlueZ errors
 	int error_count = 0;
-	
-	// Current epoch time
-	long long int epoch;
 	
 	// Kernel version info
 	struct utsname sysinfo;
@@ -469,12 +434,6 @@ int main(int argc, char *argv[])
 		case 'o':
 			outfilename = strdup(optarg);
 			break;
-		case 'r':
-			retry_count = atoi(optarg);
-			break;
-		case 'a':
-			amnesia = atoi(optarg);
-			break;	
 		case 'w':
 			scan_time =  atoi(optarg);
 			break;
@@ -555,20 +514,6 @@ int main(int argc, char *argv[])
 		printf("Use the -k option to kill a running Bluelog process.\n");
 		exit(1);
 	}
-	
-	// Sanity checks
-	if ((retry_count < 0) || (amnesia < 0))
-	{	
-		printf("Error, arguments must be positive numbers!\n");
-		exit(1);
-	}
-	
-	// Override some options that don't play nice with others
-	// If retry is set, assume names are on. Default retry value
-	if (retry_count > 0)
-		getname = 1;
-	else
-		retry_count = 3;
 	
 	// No verbose for daemon
 	if (daemon)
@@ -677,6 +622,8 @@ int main(int argc, char *argv[])
 		free(db_name);
 		sqlite3_exec(db, TABLE, NULL, NULL, &zErrMsg);
 		sqlite3_exec(db, TABLE_EVENT, NULL, NULL, &zErrMsg);
+		sqlite3_exec(db, INDEX_MAC, NULL, NULL, &zErrMsg);
+        sqlite3_exec(db, INDEX_DATE, NULL, NULL, &zErrMsg);
 		sqlite3_exec(db, "PRAGMA synchronous = OFF", NULL, NULL, &zErrMsg);
 		rc = sqlite3_exec(db, "PRAGMA journal_mode = MEMORY", NULL, NULL, &zErrMsg);
 	 	if( rc ){
@@ -686,17 +633,25 @@ int main(int argc, char *argv[])
 		}
 		/* Log start time and parameters */
 		sSQL = malloc( 200 );
-		sprintf(sSQL, "INSERT INTO session VALUES (NULL, '%d', '%s')", scan_time, get_localtime() );
+		sprintf(sSQL, "INSERT INTO session VALUES (NULL, '%d', '%s')", scan_time, get_localtime(0) );
 		sqlite3_exec(db, sSQL, NULL, NULL, &zErrMsg);
 		session_id = sqlite3_last_insert_rowid(db);
 		sprintf(sSQL, "INSERT INTO record VALUES (NULL, '%ld', @sMAC, @sDATE)", session_id);
 		//sSQL = "INSERT INTO records VALUES (NULL, @sMAC, @sDATE)";
 		rc = sqlite3_prepare_v2(db, sSQL, strlen(sSQL), &stmt, &tail);
 		if (rc) {
-			fprintf(stderr, "Can't open database: %s\n", sqlite3_errmsg(db));
+			fprintf(stderr, "Can't prepare query: %s\n", sqlite3_errmsg(db));
 			sqlite3_close(db);
 			exit(1);
 		}
+		qSQL = "SELECT COUNT(*) FROM record WHERE mac = @sMAC and gathered_on > @sDATE";
+		rc = sqlite3_prepare_v2(db, qSQL, strlen(qSQL), &query, NULL);
+		if (rc) {
+			fprintf(stderr, "Can't prepare query: %s\n", sqlite3_errmsg(db));
+			sqlite3_close(db);
+			exit(1);
+		}
+		
 		printf("Sqlite statement ready\n");
 		#endif
 		if (!quiet)
@@ -709,12 +664,11 @@ int main(int argc, char *argv[])
 	}
 	
 	// Open status file
-	if (bluelive)
-	{
-		if (!quiet)		
+	if (bluelive) {
+		if (!quiet)	{	
 			printf("Opening info file: %s...", infofilename);
-		if ((infofile = fopen(infofilename,"w")) == NULL)
-		{
+		}
+		if ((infofile = fopen(infofilename,"w")) == NULL) {
 			printf("\n");
 			printf("Error opening info file!\n");
 			exit(1);
@@ -728,21 +682,20 @@ int main(int argc, char *argv[])
 		write_pid(getpid());
 	
 	// Get and print time to console and file
-	strcpy(cur_time, get_localtime());
+	strcpy(cur_time, get_localtime(0));
 		
-	if (!daemon)
+	if (!daemon) {
 		printf("Scan started at [%s] on %s.\n", cur_time, addr);
+	}
 	
-	if (showtime)
-	{
+	if (showtime) {
 		fprintf(outfile,"[%s] Scan started on %s\n", cur_time, addr);
 		// Make sure this gets written out
 		fflush(outfile);
 	}
 		
 	// Write info file for Bluelog Live
-	if (bluelive)
-	{
+	if (bluelive) {
 		fprintf(infofile,"<div class=\"sideitem\">%s Version: %s%s</div>\n", APPNAME, VERSION, VER_MOD);
 		fprintf(infofile,"<div class=\"sideitem\">Device: %s</div>\n", addr);
 		fprintf(infofile,"<div class=\"sideitem\">Started: %s</div>\n", cur_time);
@@ -755,10 +708,9 @@ int main(int argc, char *argv[])
 	syslog(LOG_INFO,"Init OK!");
 	
 	// Daemon switch
-	if (daemon)
+	if (daemon) {
 		daemonize();
-	else
-	{
+	} else {
 		if (!quiet)
 			printf("Hit Ctrl+C to end scan.\n");
 	}
@@ -815,20 +767,11 @@ int main(int argc, char *argv[])
 			sleep(1);
 			continue;
 		}
-		else
-		{
+		else {
 			// Clear error counter
 			error_count = 0;
 		}
 		
-		// Check if we need to reset device cache
-		if ((cache_index + num_results) >= MAX_DEV)
-		{
-			// syslog(LOG_INFO,"Resetting device cache...");
-			memset(dev_cache, 0, sizeof(dev_cache));
-			cache_index = 0;
-		}
-
 		/* Explicitly begin a transaction once for all gathered macs at each 
 		*  turn; wrapping a sequence of insert by a single transaction makes
 		*  inserts faster rather than a transaction for each insert (default)
@@ -840,200 +783,134 @@ int main(int argc, char *argv[])
 		for (i = 0; i < num_results; i++) {	
 			// Return current MAC from struct
 			ba2str(&(results+i)->bdaddr, addr);
+            sqlite3_bind_text(query, 1, addr, strlen(addr), SQLITE_STATIC);
+       		sqlite3_bind_text(query, 2, get_localtime(20), -1, SQLITE_STATIC);    // 30minutes = 1800seconds
+       		int s = sqlite3_step(query);
+       		if (s != SQLITE_ROW) {
+       		    printf("Unexpected response from sqlite3_step(query)");
+       			shut_down(0);
+       		}
+       		int n_element  = sqlite3_column_int(query, 0);
+            sqlite3_clear_bindings(query);
+            sqlite3_reset(query);
+
+            if (n_element != 0) {
+                printf("%s already logged (%d)\n", addr, n_element);
+                break;
+            }
+            printf("%s) logging (%s)\n", get_localtime(0), addr);
+            // Log the new device
+			memset(&new_device, 0, sizeof(new_device));
+			// Write new device 
+			strcpy(new_device.addr, addr);
 			
-			// Compare to device cache
-			for (ri = 0; ri <= cache_index; ri++)
-			{				
-				// Determine if device is already logged
-				if ((strcmp (addr, dev_cache[ri].addr) == 0) || (strcmp (addr, dev_cache[ri].priv_addr) == 0))
-				{		
-					// This device has been seen before
-					
-					// Increment seen count, update printed time
-					dev_cache[ri].seen++;
-					strcpy(dev_cache[ri].time, get_localtime());
-					
-					// If we don't have a name, query again
-					if ((dev_cache[ri].print == 3) && (dev_cache[ri].seen > retry_count))
-					{
-						syslog(LOG_INFO,"Unable to find name for %s!", addr);
-						dev_cache[ri].print = 1;
-					}
-					else if ((dev_cache[ri].print == 3) && (dev_cache[ri].seen < retry_count))
-					{
-						// Query name
-						strcpy(dev_cache[ri].name, namequery(&(results+i)->bdaddr));
-						
-						// Did we get one?
-						if (strcmp (dev_cache[ri].name, "VOID") != 0)
-						{
-							syslog(LOG_INFO,"Name retry for %s successful!", addr);
-							// Force print
-							dev_cache[ri].print = 1;
-						}
-						else
-							syslog(LOG_INFO,"Name retry %i for %s failed!",dev_cache[ri].seen, addr);
-					}
-					
-					// Amnesia mode
-					if (amnesia > 0)
-					{
-						// Find current epoch time
-						epoch = time(NULL);
-						if ((epoch - dev_cache[ri].epoch) >= (amnesia * 60))
-						{
-							// Update epoch time
-							dev_cache[ri].epoch = epoch;
-							// Set device to print
-							dev_cache[ri].print = 1;
-						}
-					}
-					
-					// Unless we need to get printed, move to next result
-					if (dev_cache[ri].print != 1)
-						break;
-				}
-				else if (strcmp (dev_cache[ri].addr, "") == 0) 
-				{
-					// Write new device to cache
-					strcpy(dev_cache[ri].addr, addr);
-					
-					// Query for name
-					if (getname)
-						strcpy(dev_cache[ri].name, namequery(&(results+i)->bdaddr));
-					else
-						strcpy(dev_cache[ri].name, "IGNORED");
+			// Query for name
+			if (getname)
+				strcpy(new_device.name, namequery(&(results+i)->bdaddr));
+			else
+				strcpy(new_device.name, "IGNORED");
 
-					// Get time found
-					strcpy(dev_cache[ri].time, get_localtime());
-					dev_cache[ri].epoch = time(NULL);
-					
-					// Class info
-					dev_cache[ri].flags = (results+i)->dev_class[2];
-					dev_cache[ri].major_class = (results+i)->dev_class[1];
-					dev_cache[ri].minor_class = (results+i)->dev_class[0];
-					
-					// Init misc variables
-					dev_cache[ri].seen = 1;
-					
-					// Increment index	
-					cache_index++;	
-					
-					// If we have a device name, get printed
-					if (strcmp (dev_cache[ri].name, "VOID") != 0)
-						dev_cache[ri].print = 1;
-					else
-					{
-						// Found with no name.
-						// Print message to syslog, prevent printing, and move on
-						syslog(LOG_INFO,"Device %s discovered with no name, will retry", dev_cache[ri].addr);
-						dev_cache[ri].print = 3;
-						break;
-					}											
-				}
-							
-				// Ready to print?
-				if (dev_cache[ri].print == 1) 
-				{	
-					// Obfuscate MAC
-					if (obfuscate)
-					{
-						// Preserve real MAC
-						strcpy(dev_cache[ri].priv_addr, dev_cache[ri].addr);
+			// Get time found
+			strcpy(new_device.time, get_localtime(0));
+			
+			// Class info
+			new_device.flags = (results+i)->dev_class[2];
+			new_device.major_class = (results+i)->dev_class[1];
+			new_device.minor_class = (results+i)->dev_class[0];
+			
+		
+			// If we have a device name, get printed
+			if (strcmp (new_device.name, "VOID") == 0) {
+				// Found with no name.
+				// Print message to syslog, prevent printing, and move on
+				syslog(LOG_INFO,"Device %s discovered with no name", new_device.addr);
+				break;
+			}											
+				
+			// Obfuscate MAC
+			if (obfuscate) {
+				// Preserve real MAC
+				strcpy(new_device.priv_addr, new_device.addr);
 
-						// Split out OUI, replace device with XX
-						strncpy(addr_buff, dev_cache[ri].addr, 9);
-						strcat(addr_buff, "XX:XX:XX");
-						
-						// Copy to DB, clear buffer for next device
-						strcpy(dev_cache[ri].addr, addr_buff);
-						memset(addr_buff, '\0', sizeof(addr_buff));
-					}
-					
-					// Write to syslog if we are daemon
-					if (daemon);
-						if (syslogonly)
-							syslog(LOG_INFO,"Found new device: %s",dev_cache[ri].addr);
-					
-					// Print everything to console if verbose is on
-					if (verbose)
-						printf("[%s] %s,%s,0x%02x%02x%02x\n",\
-						dev_cache[ri].time, dev_cache[ri].addr,\
-						dev_cache[ri].name, dev_cache[ri].flags,\
-						dev_cache[ri].major_class, dev_cache[ri].minor_class);
-											
-					if (bluelive)
-					{
-						// Write result with live function
-						live_entry(ri);
-					}
-					else if (bluepropro)
-					{
-						// Set output format for BlueProPro
-						fprintf(outfile,"%s", dev_cache[ri].addr);
-						fprintf(outfile,",0x%02x%02x%02x", dev_cache[ri].flags,\
-						dev_cache[ri].major_class, dev_cache[ri].minor_class);
-						fprintf(outfile,",%s\n", dev_cache[ri].name);
-					}
-					else 
-					{
-						// Flush buffer
-						memset(outbuffer, 0, sizeof(outbuffer));
-						
-						// Print time first if enabled
-						if (showtime) {
-							sprintf(outbuffer,"[%s] ", dev_cache[ri].time);
-						}
-							
-						// Always output MAC
-						sprintf(outbuffer+strlen(outbuffer),"%s", dev_cache[ri].addr);
-						#ifdef SQLITE
-						sqlite3_bind_text(stmt, 1, dev_cache[ri].addr, -1, SQLITE_TRANSIENT);
-						sqlite3_bind_text(stmt, 2, dev_cache[ri].time, -1, SQLITE_STATIC); 
-						// run the insert
-						sqlite3_step(stmt);
-						// Clear stmt for the next insert
-						sqlite3_clear_bindings(stmt);
-						sqlite3_reset(stmt);
-						#endif
-						
-
-						// Optionally output class
-						if (showclass)					
-							sprintf(outbuffer+strlen(outbuffer),",0x%02x%02x%02x", dev_cache[ri].flags,\
-							dev_cache[ri].major_class, dev_cache[ri].minor_class);
-							
-						// "Friendly" version of class info
-						if (friendlyclass)					
-							sprintf(outbuffer+strlen(outbuffer),",%s,(%s)",\
-							device_class(dev_cache[ri].major_class, dev_cache[ri].minor_class),\
-							device_capability(dev_cache[ri].flags));
-							
-						// Append the name
-						if (getname)
-							sprintf(outbuffer+strlen(outbuffer),",%s", dev_cache[ri].name);
-						
-						// Send buffer, else file. File needs newline
-						if (syslogonly)
-							syslog(LOG_INFO,"%s", outbuffer);
-						else
-							fprintf(outfile,"%s\n",outbuffer);
-					}
-					dev_cache[ri].print = 0;
-					break;
-				}
-				// If we make it this far, it means we will check next stored device
+				// Split out OUI, replace device with XX
+				strncpy(addr_buff, new_device.addr, 9);
+				strcat(addr_buff, "XX:XX:XX");
+				
+				// Copy to DB, clear buffer for next device
+				strcpy(new_device.addr, addr_buff);
+				memset(addr_buff, '\0', sizeof(addr_buff));
 			}
+			
+			// Write to syslog if we are daemon
+			if (daemon);
+				if (syslogonly)
+					syslog(LOG_INFO,"Found new device: %s",new_device.addr);
+			
+			// Print everything to console if verbose is on
+			if (verbose)
+				printf("[%s] %s,%s,0x%02x%02x%02x\n",\
+				new_device.time, new_device.addr,\
+				new_device.name, new_device.flags,\
+				new_device.major_class, new_device.minor_class);
+									
+            if (bluepropro) {
+				// Set output format for BlueProPro
+				fprintf(outfile,"%s", new_device.addr);
+				fprintf(outfile,",0x%02x%02x%02x", new_device.flags,\
+				new_device.major_class, new_device.minor_class);
+				fprintf(outfile,",%s\n", new_device.name);
+			} else {
+				// Flush buffer
+				memset(outbuffer, 0, sizeof(outbuffer));
+				
+				// Print time first if enabled
+				if (showtime) {
+					sprintf(outbuffer,"[%s] ", new_device.time);
+				}
+					
+				// Always output MAC
+				sprintf(outbuffer+strlen(outbuffer),"%s", new_device.addr);
+				// Optionally output class
+				if (showclass)					
+					sprintf(outbuffer+strlen(outbuffer),",0x%02x%02x%02x", new_device.flags,\
+					new_device.major_class, new_device.minor_class);
+					
+				// "Friendly" version of class info
+				if (friendlyclass)					
+					sprintf(outbuffer+strlen(outbuffer),",%s,(%s)",\
+					device_class(new_device.major_class, new_device.minor_class),\
+					device_capability(new_device.flags));
+					
+				// Append the name
+				if (getname)
+					sprintf(outbuffer+strlen(outbuffer),",%s", new_device.name);
+				
+				// Send buffer, else file. File needs newline
+				if (syslogonly)
+					syslog(LOG_INFO,"%s", outbuffer);
+				else
+					fprintf(outfile,"%s\n",outbuffer);
+			}
+
+			#ifdef SQLITE
+			sqlite3_bind_text(stmt, 1, new_device.addr, -1, SQLITE_TRANSIENT);
+			sqlite3_bind_text(stmt, 2, new_device.time, -1, SQLITE_STATIC); 
+			// run the insert
+			sqlite3_step(stmt);
+			// Clear stmt for the next insert
+			sqlite3_clear_bindings(stmt);
+			sqlite3_reset(stmt);
+			#endif
 			// Write any new changes
 			if (!syslogonly)
 				fflush(outfile);
-			#ifdef SQLITE
-			sqlite3_exec(db, "END TRANSACTION", NULL, NULL, &zErrMsg);
-			#endif
 			
-			
-		}
-	}
+		} // for to parse results 
+		#ifdef SQLITE
+		sqlite3_exec(db, "END TRANSACTION", NULL, NULL, &zErrMsg);
+		#endif
+
+	}// for seamless
 	// Clear out results buffer
 	free(results);
 	// If we get here, shut down
