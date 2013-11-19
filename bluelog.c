@@ -318,12 +318,10 @@ static struct option main_options[] = {
 	{ "output",	1, 0, 'o' },
 	{ "verbose", 0, 0, 'v' },
 	{ "retry", 1, 0, 'r' },
-	{ "amnesia", 1, 0, 'a' },
 	{ "window", 1, 0, 'w' },
 	{ "time", 0, 0, 't' },
 	{ "obfuscate", 0, 0, 'x' },
 	{ "class", 0, 0, 'c' },
-	{ "live", 0, 0, 'l' },
 	{ "kill", 0, 0, 'k' },
 	{ "friendly", 0, 0, 'f' },
 	{ "bluepropro", 0, 0, 'b' },
@@ -392,7 +390,6 @@ int main(int argc, char *argv[])
 	int obfuscate = 0;
 	int showclass = 0;
 	int friendlyclass = 0;
-	int bluelive = 0;
 	int daemon = 0;
 	int bluepropro = 0;
 	int getname = 0;
@@ -458,15 +455,6 @@ int main(int argc, char *argv[])
 		case 'q':
 			quiet = 1;
 			break;			
-		case 'l':
-			if(!LIVEMODE)
-			{
-				printf("Live mode has been disabled in this build. See documentation.\n");
-				exit(0);
-			}
-			else
-				bluelive = 1;
-			break;
 		case 'b':
 			bluepropro = 1;
 			break;
@@ -520,9 +508,7 @@ int main(int argc, char *argv[])
 		verbose = 0;
 		
 	// No Bluelog Live when running BPP, names on, syslog off
-	if (bluepropro)
-	{
-		bluelive = 0;
+	if (bluepropro) {
 		getname = 1;
 		syslogonly = 0;
 	}
@@ -531,19 +517,10 @@ int main(int argc, char *argv[])
 	if (showclass)
 		friendlyclass = 0;
 			
-	// No timestamps for Bluelog Live, names on, syslog off
-	if (bluelive)
-	{
-		showtime = 0;
-		getname = 1;
-		syslogonly = 0;
-	}
-	
 	// No timestamps in syslog mode, disable other modes
 	if (syslogonly)
 	{
 		showtime = 0;
-		bluelive = 0;
 		bluepropro = 0;
 	}
 
@@ -596,14 +573,6 @@ int main(int argc, char *argv[])
 	// Open output file
 	if (!syslogonly)
 	{
-		if (bluelive)
-		{
-			// Change location of output file
-			outfilename = LIVE_OUT;
-			filemode = "w";
-			if (!quiet)
-				printf("Starting Bluelog Live...\n");
-		}
 		if (!quiet)		
 			printf("Opening output file: %s...", outfilename);
 		if ((outfile = fopen(outfilename, filemode)) == NULL)
@@ -663,20 +632,6 @@ int main(int argc, char *argv[])
 			printf("In syslog mode, log file disabled.\n");
 	}
 	
-	// Open status file
-	if (bluelive) {
-		if (!quiet)	{	
-			printf("Opening info file: %s...", infofilename);
-		}
-		if ((infofile = fopen(infofilename,"w")) == NULL) {
-			printf("\n");
-			printf("Error opening info file!\n");
-			exit(1);
-		}
-		if (!quiet)
-			printf("OK\n");
-	}
-	
 	// Write PID file
 	if (!daemon)
 		write_pid(getpid());
@@ -694,16 +649,6 @@ int main(int argc, char *argv[])
 		fflush(outfile);
 	}
 		
-	// Write info file for Bluelog Live
-	if (bluelive) {
-		fprintf(infofile,"<div class=\"sideitem\">%s Version: %s%s</div>\n", APPNAME, VERSION, VER_MOD);
-		fprintf(infofile,"<div class=\"sideitem\">Device: %s</div>\n", addr);
-		fprintf(infofile,"<div class=\"sideitem\">Started: %s</div>\n", cur_time);
-		
-		// Think we are done with you now
-		fclose(infofile);
-	}
-	
 	// Log success to this point
 	syslog(LOG_INFO,"Init OK!");
 	
