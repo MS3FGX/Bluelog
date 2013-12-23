@@ -161,43 +161,52 @@ static void cfg_read (void)
 			// Get token's associated value
 			value = strtok(NULL,"\t =\n\r");
   
-            // See if token matches something
-			if (strcmp(token, "VERBOSE") == 0)
-				config.verbose = (atoi(value));
-			else if (strcmp(token, "QUIET") == 0)
-				config.quiet = atoi(value);
-			else if (strcmp(token, "DAEMON") == 0)
-				config.daemon = (atoi(value));
-			else if (strcmp(token, "LIVEMODE") == 0)
-				config.bluelive = (atoi(value));
-			else if (strcmp(token, "SHOWTIME") == 0)
-				config.showtime = (atoi(value));		
-			else if (strcmp(token, "OBFUSCATE") == 0)
-				config.obfuscate = (atoi(value));
-			else if (strcmp(token, "ENCODE") == 0)
-				config.encode = (atoi(value));				
-			else if (strcmp(token, "SHOWCLASS") == 0)
-				config.showclass = (atoi(value));
-			else if (strcmp(token, "FRIENDLYCLASS") == 0)
-				config.friendlyclass = (atoi(value));
-			else if (strcmp(token, "BLUEPROPRO") == 0)
-				config.bluepropro = (atoi(value));
-			else if (strcmp(token, "GETNAME") == 0)
-				config.getname = atoi(value);
-			else if (strcmp(token, "AMNESIA") == 0)
-				config.amnesia = (atoi(value));
-			else if (strcmp(token, "SYSLOGONLY") == 0)
-				config.syslogonly = (atoi(value));
-			else if (strcmp(token, "GETMANUFACTURER") == 0)
-				config.getmanufacturer = (atoi(value));			
-			else if (strcmp(token, "SCANWINDOW") == 0)
-				config.scan_window = (atoi(value));
-			else if (strcmp(token, "RETRYCOUNT") == 0)
-				config.retry_count = (atoi(value));
+			if (value != NULL)
+			{
+				// See if token matches something
+				if (strcmp(token, "VERBOSE") == 0)
+					config.verbose = (atoi(value));
+				else if (strcmp(token, "QUIET") == 0)
+					config.quiet = atoi(value);
+				else if (strcmp(token, "DAEMON") == 0)
+					config.daemon = (atoi(value));
+				else if (strcmp(token, "LIVEMODE") == 0)
+					config.bluelive = (atoi(value));
+				else if (strcmp(token, "SHOWTIME") == 0)
+					config.showtime = (atoi(value));		
+				else if (strcmp(token, "OBFUSCATE") == 0)
+					config.obfuscate = (atoi(value));
+				else if (strcmp(token, "ENCODE") == 0)
+					config.encode = (atoi(value));				
+				else if (strcmp(token, "SHOWCLASS") == 0)
+					config.showclass = (atoi(value));
+				else if (strcmp(token, "FRIENDLYCLASS") == 0)
+					config.friendlyclass = (atoi(value));
+				else if (strcmp(token, "BLUEPROPRO") == 0)
+					config.bluepropro = (atoi(value));
+				else if (strcmp(token, "GETNAME") == 0)
+					config.getname = atoi(value);
+				else if (strcmp(token, "AMNESIA") == 0)
+					config.amnesia = (atoi(value));
+				else if (strcmp(token, "SYSLOGONLY") == 0)
+					config.syslogonly = (atoi(value));
+				else if (strcmp(token, "GETMANUFACTURER") == 0)
+					config.getmanufacturer = (atoi(value));			
+				else if (strcmp(token, "SCANWINDOW") == 0)
+					config.scan_window = (atoi(value));
+				else if (strcmp(token, "RETRYCOUNT") == 0)
+					config.retry_count = (atoi(value));
+				else
+				{
+					printf("FAILED\n");
+					printf("Syntax error or unknown option in configuration file on line %i!\n", linenum);
+					exit(1);
+				}
+			}
 			else
 			{
 				printf("FAILED\n");
-				printf("Syntax error in configuration file on line %i!\n", linenum);
+				printf("Value missing in configuration file on line %i!\n", linenum);
 				exit(1);
 			}
 		}
