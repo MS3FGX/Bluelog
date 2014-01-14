@@ -1,3 +1,6 @@
+01/13/14:
+	Fix name resolution always being on.
+
 12/23/13:
 	Gracefully handle missing value in config file
 

@@ -92,12 +92,10 @@ static void cfg_check (void)
 	}	
 	
 	// Override some options that don't play nice with others
-	// If retry is set, assume names are on. Default retry value
-	if (config.retry_count > 0)
+	// If retry is different from default, assume names are on.
+	if (config.retry_count != 3)
 		config.getname = 1;
-	else
-		config.retry_count = 3;
-	
+
 	// No verbose for daemon
 	if (config.daemon)
 		config.verbose = 0;
