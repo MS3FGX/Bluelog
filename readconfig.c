@@ -143,10 +143,10 @@ static void cfg_read (void)
 	char* value;
 	int linenum = 1;
         
-    // Open file, show error if we can't
+	// Open file, show error if we can't
 	if (!config.quiet)		
 		printf("Opening config file: %s...", CFG_FILE); 
-    if ((cfgfile = fopen(CFG_FILE, "r")) == NULL)
+	if ((cfgfile = fopen(CFG_FILE, "r")) == NULL)
 	{
 		printf("Error!\n");
 		exit(1);
