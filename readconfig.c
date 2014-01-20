@@ -41,6 +41,7 @@ struct cfg
 	// Advanced
 	int retry_count;
 	int scan_window;
+	int hci_device;
 	
 	// System
 	int bt_socket;
@@ -65,6 +66,7 @@ struct cfg config =
 	.getmanufacturer = 0,
 	.retry_count = 3,
 	.scan_window = 8,
+	.hci_device = 0,
 };
 
 // Determine if config file is present
@@ -194,6 +196,8 @@ static void cfg_read (void)
 					config.scan_window = (atoi(value));
 				else if (strcmp(token, "RETRYCOUNT") == 0)
 					config.retry_count = (atoi(value));
+				else if (strcmp(token, "HCIDEVICE") == 0)
+					config.hci_device = (atoi(value));
 				else
 				{
 					printf("FAILED\n");
