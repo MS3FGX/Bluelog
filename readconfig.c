@@ -135,7 +135,7 @@ static void cfg_check (void)
 		config.obfuscate = 0;
 }
 
-static void cfg_read (void)
+int cfg_read (void)
 {
 	FILE* cfgfile;
 	char line[MAX_LINE_LEN + 1];
@@ -143,15 +143,10 @@ static void cfg_read (void)
 	char* value;
 	int linenum = 1;
         
-	// Open file, show error if we can't
-	if (!config.quiet)		
-		printf("Opening config file: %s...", CFG_FILE); 
+	// Open file, return error if something goes wrong
 	if ((cfgfile = fopen(CFG_FILE, "r")) == NULL)
-	{
-		printf("Error!\n");
-		exit(1);
-	}
-    
+		return(1);
+		
 	// Continue until file is done
 	while(fgets(line, MAX_LINE_LEN, cfgfile) != NULL)
 	{
@@ -215,6 +210,6 @@ static void cfg_read (void)
 	// Increment line number
 	linenum++;
 	}
-	if (!config.quiet)
-		printf("OK\n");
+
+	return (0);
 }

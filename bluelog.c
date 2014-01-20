@@ -509,6 +509,21 @@ int main(int argc, char *argv[])
 		printf("Use the -k option to kill a running Bluelog process.\n");
 		exit(1);
 	}
+	
+	// Load config from file if no options given on command line
+	if(cfg_exists() && argc == 1)
+	{		
+		if (cfg_read() != 0)
+		{
+			printf("Error opening config file!\n");
+			exit(1);
+		}
+		// Put interface into BT struct
+		hci_devba(config.hci_device, &bdaddr);
+	}
+		
+	// Perform sanity checks on varibles
+	cfg_check();
 
 	// Setup libmackerel
 	mac_init();	
@@ -522,6 +537,10 @@ int main(int argc, char *argv[])
 		#endif
 		printf("---------------------------\n");
 	}
+	
+	// Show notification we loaded config from file
+	if(cfg_exists() && argc == 1 && !config.quiet)
+		printf("Config loaded from: %s\n", CFG_FILE);
 
 	// Init Hardware
 	ba2str(&bdaddr, addr);
@@ -550,16 +569,10 @@ int main(int argc, char *argv[])
 		printf("Error initializing Bluetooth device!\n");
 		exit(1);
 	}
+	
 	// If we get here the device should be online.
 	if (!config.quiet)
 		printf("OK\n");
-	
-	// See if we should use config file
-	if(cfg_exists() && argc == 1)
-		cfg_read();
-		
-	// Perform sanity checks on varibles
-	cfg_check();
 
 	// Status message for BPP
 	if (!config.quiet)
@@ -618,7 +631,7 @@ int main(int argc, char *argv[])
 	strcpy(cur_time, get_localtime());
 		
 	if (!config.daemon)
-		printf("Scan started at [%s] on %s.\n", cur_time, addr);
+		printf("Scan started at [%s] on %s\n", cur_time, addr);
 	
 	if (config.showtime)
 	{

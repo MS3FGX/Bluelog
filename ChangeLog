@@ -1,3 +1,7 @@
+01/19/14:
+	Fix "Quiet" mode not working from config file
+	Enable setting BT interface in config file
+
 01/13/14:
 	Fix name resolution always being on.
 
