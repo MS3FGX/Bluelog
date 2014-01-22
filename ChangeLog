@@ -1,3 +1,7 @@
+01/21/14:
+	Fix manufacturer mode not working with encode or obfuscate
+	Better separate user-visible and internal copies of discovered MAC
+
 01/19/14:
 	Fix "Quiet" mode not working from config file
 	Enable setting BT interface in config file

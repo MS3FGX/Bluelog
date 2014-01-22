@@ -149,7 +149,7 @@ void live_entry(int index)
 	
 	// Last field is variable
 	if (config.getmanufacturer)
-		fprintf(outfile,"%s", mac_get_vendor(dev_cache[index].addr));
+		fprintf(outfile,"%s", mac_get_vendor(dev_cache[index].priv_addr));
 	else
 		fprintf(outfile,"%s", local_capabilities);
 		
@@ -742,7 +742,7 @@ int main(int argc, char *argv[])
 			for (ri = 0; ri <= cache_index; ri++)
 			{				
 				// Determine if device is already logged
-				if ((strcmp (addr, dev_cache[ri].addr) == 0) || (strcmp (addr, dev_cache[ri].priv_addr) == 0))
+				if (strcmp (addr, dev_cache[ri].priv_addr) == 0)
 				{		
 					// This device has been seen before
 					
@@ -792,8 +792,9 @@ int main(int argc, char *argv[])
 				}
 				else if (strcmp (dev_cache[ri].addr, "") == 0) 
 				{
-					// Write new device to cache
+					// Write new device MAC (visible and internal use)
 					strcpy(dev_cache[ri].addr, addr);
+					strcpy(dev_cache[ri].priv_addr, addr);					
 					
 					// Query for name
 					if (config.getname)
@@ -837,9 +838,6 @@ int main(int argc, char *argv[])
 					{
 						// Clear buffer
 						memset(addr_buff, '\0', sizeof(addr_buff));
-						
-						// Preserve real MAC
-						strcpy(dev_cache[ri].priv_addr, dev_cache[ri].addr);
 
 						if (config.obfuscate)
 							strcpy(addr_buff, mac_obfuscate(dev_cache[ri].addr));
