@@ -745,7 +745,7 @@ int main(int argc, char *argv[])
 				if (strcmp (addr, dev_cache[ri].priv_addr) == 0)
 				{		
 					// This device has been seen before
-					
+			
 					// Increment seen count, update printed time
 					dev_cache[ri].seen++;
 					strcpy(dev_cache[ri].time, get_localtime());
@@ -840,10 +840,10 @@ int main(int argc, char *argv[])
 						memset(addr_buff, '\0', sizeof(addr_buff));
 
 						if (config.obfuscate)
-							strcpy(addr_buff, mac_obfuscate(dev_cache[ri].addr));
+							strcpy(addr_buff, mac_obfuscate(dev_cache[ri].priv_addr));
 						
 						if (config.encode)
-							strcpy(addr_buff, mac_encode(dev_cache[ri].addr));
+							strcpy(addr_buff, mac_encode(dev_cache[ri].priv_addr));
 
 						// Copy to cache
 						strcpy(dev_cache[ri].addr, addr_buff);

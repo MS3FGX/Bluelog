@@ -1,5 +1,6 @@
 01/21/14:
 	Fix manufacturer mode not working with encode or obfuscate
+	Fix Amnesia mode not working with encode or obfuscate
 	Better separate user-visible and internal copies of discovered MAC
 
 01/19/14:
