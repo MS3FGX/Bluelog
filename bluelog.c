@@ -40,6 +40,7 @@
 #include "classes.c"
 #include "libmackerel.c"
 #include "readconfig.c"
+#include "udp.c"
 
 // Found device struct
 struct btdev
@@ -579,9 +580,13 @@ int main(int argc, char *argv[])
 		if (config.bluepropro)
 			printf("Output formatted for BlueProPro.\n"
 				   "More Info: www.hackfromacave.com\n");
-	
-	// Open output file
-	if (!config.syslogonly)
+				   	
+	// Open socket 
+	if (config.udponly)
+		open_udp_socket();
+
+	// Open output file, unless in networking mode
+	if (!config.syslogonly && !config.udponly)
 	{
 		if (config.bluelive)
 		{
@@ -603,10 +608,8 @@ int main(int argc, char *argv[])
 			printf("OK\n");
 	}
 	else
-	{
 		if (!config.quiet)
-			printf("In syslog mode, log file disabled.\n");
-	}
+			printf("Network mode enabled, not creating log file.\n");
 	
 	// Open status file
 	if (config.bluelive)
@@ -906,7 +909,7 @@ int main(int argc, char *argv[])
 						
 						// Get manufacturer
 						if (config.getmanufacturer)
-							sprintf(outbuffer+strlen(outbuffer),",%s", mac_get_vendor(dev_cache[ri].addr));
+							sprintf(outbuffer+strlen(outbuffer),",%s", mac_get_vendor(dev_cache[ri].priv_addr));
 							
 						// Append the name
 						if (config.getname)
@@ -915,6 +918,12 @@ int main(int argc, char *argv[])
 						// Send buffer, else file. File needs newline
 						if (config.syslogonly)
 							syslog(LOG_INFO,"%s", outbuffer);
+						else if (config.udponly)
+						{
+							// Append newline to socket, kind of hacky
+							sprintf(outbuffer+strlen(outbuffer),"\n");
+							send_udp_msg(outbuffer);
+						}
 						else
 							fprintf(outfile,"%s\n",outbuffer);
 					}
@@ -923,8 +932,8 @@ int main(int argc, char *argv[])
 				}
 				// If we make it this far, it means we will check next stored device
 			}
-			// Write any new changes
-			if (!config.syslogonly)
+			// If there's a file open, write changes
+			if (outfile != NULL)
 				fflush(outfile);
 		}
 	}
@@ -933,4 +942,3 @@ int main(int argc, char *argv[])
 	// STFU
 	return (1);
 }
-
