@@ -105,7 +105,7 @@ void shut_down(int sig)
 	printf("\n");
 	printf("Closing files and freeing memory...");
 	// Only show this if timestamps are enabled
-	if (config.showtime)
+	if (config.showtime && (outfile != NULL))
 		fprintf(outfile,"[%s] Scan ended.\n", get_localtime());
 	
 	// Don't try to close a file that doesn't exist, kernel gets mad
@@ -632,11 +632,11 @@ int main(int argc, char *argv[])
 	
 	// Get and print time to console and file
 	strcpy(cur_time, get_localtime());
-		
+	
 	if (!config.daemon)
 		printf("Scan started at [%s] on %s\n", cur_time, addr);
 	
-	if (config.showtime)
+	if (config.showtime && (outfile != NULL))
 	{
 		fprintf(outfile,"[%s] Scan started on %s\n", cur_time, addr);
 		// Make sure this gets written out
