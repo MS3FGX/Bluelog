@@ -56,6 +56,9 @@ int open_udp_socket (void)
 	adr_srvr.sin_port = htons(config.server_port);
 	adr_srvr.sin_addr.s_addr =  inet_addr(config.server_ip);
 
+	if (!config.quiet)
+		printf("Opening UDP socket to %s:%i...", config.server_ip, config.server_port);
+	
 	// Valid IP?
 	if (adr_srvr.sin_addr.s_addr == INADDR_NONE)
 	{
@@ -77,5 +80,8 @@ int open_udp_socket (void)
 		sprintf(sktMsgBuffer+strlen(sktMsgBuffer),"%s\n" , config.node_name);
 		send_udp_msg(sktMsgBuffer);
 	}
-return 0;
+	
+	// All good
+	printf("OK\n");
+	return 0;
 }
