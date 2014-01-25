@@ -150,8 +150,9 @@ static void cfg_check (void)
 	{
 		config.bluelive = 0;
 		config.bluepropro = 0;
+		config.syslogonly = 0;
 	}
-	
+
 	// Encode trumps obfuscate
 	if (config.encode)
 		config.obfuscate = 0;
