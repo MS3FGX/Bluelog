@@ -11,8 +11,9 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 
-// Longest line in config file
+// Size limits
 #define MAX_LINE_LEN 256
+#define MAX_VALUE_LEN 64
 
 // Struct to hold configuration variables
 struct cfg
@@ -43,8 +44,16 @@ struct cfg
 	int scan_window;
 	int hci_device;
 	
+	// Network
+	int udponly;
+	int server_port;
+	int banner;
+	char node_name[MAX_VALUE_LEN];
+	char server_ip[MAX_VALUE_LEN];
+	
 	// System
 	int bt_socket;
+	int udp_socket;
 };
 
 // Define global struct, set default values
@@ -67,6 +76,12 @@ struct cfg config =
 	.retry_count = 3,
 	.scan_window = 8,
 	.hci_device = 0,
+	.udponly = 0,
+	.udp_socket = -1,
+	.server_port = 1234,
+	.banner = 0,
+	.server_ip = "NULL",
+	.node_name = "NULL",
 };
 
 // Determine if config file is present
@@ -130,6 +145,13 @@ static void cfg_check (void)
 		config.bluepropro = 0;
 	}
 	
+	// UDP disables other modes
+	if (config.udponly)
+	{
+		config.bluelive = 0;
+		config.bluepropro = 0;
+	}
+	
 	// Encode trumps obfuscate
 	if (config.encode)
 		config.obfuscate = 0;
@@ -155,9 +177,17 @@ int cfg_read (void)
 		{			
 			// Get token's associated value
 			value = strtok(NULL,"\t =\n\r");
-  
+
 			if (value != NULL)
 			{
+				// Is it too large?
+				if ((sizeof (value)) > MAX_VALUE_LEN)
+				{
+					printf("FAILED\n");
+					printf("Value too large on line %i!\n", linenum);
+					exit(1);
+				}
+				
 				// See if token matches something
 				if (strcmp(token, "VERBOSE") == 0)
 					config.verbose = (atoi(value));
@@ -193,6 +223,16 @@ int cfg_read (void)
 					config.retry_count = (atoi(value));
 				else if (strcmp(token, "HCIDEVICE") == 0)
 					config.hci_device = (atoi(value));
+				else if (strcmp(token, "UDPONLY") == 0)
+					config.udponly = (atoi(value));
+				else if (strcmp(token, "SERVERIP") == 0)
+					strcpy(config.server_ip, value);
+				else if (strcmp(token, "SERVERPORT") == 0)
+					config.server_port = (atoi(value));					
+				else if (strcmp(token, "NODENAME") == 0)
+					strcpy(config.node_name, value);
+				else if (strcmp(token, "BANNER") == 0)
+					config.banner = (atoi(value));
 				else
 				{
 					printf("FAILED\n");
