@@ -54,6 +54,7 @@ struct cfg
 	// System
 	int bt_socket;
 	int udp_socket;
+	char addr[19];
 };
 
 // Define global struct, set default values
@@ -82,6 +83,7 @@ struct cfg config =
 	.banner = 0,
 	.server_ip = "NULL",
 	.node_name = "NULL",
+	.addr = "NULL",
 };
 
 // Determine if config file is present

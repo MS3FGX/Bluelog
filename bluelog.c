@@ -544,21 +544,21 @@ int main(int argc, char *argv[])
 		printf("Config loaded from: %s\n", CFG_FILE);
 
 	// Init Hardware
-	ba2str(&bdaddr, addr);
-	if (!strcmp(addr, "00:00:00:00:00:00"))
+	ba2str(&bdaddr, config.addr);
+	if (!strcmp(config.addr, "00:00:00:00:00:00"))
 	{
 		if (!config.quiet)
 			printf("Autodetecting device...");
 		device = hci_get_route(NULL);
 		// Put autodetected device MAC into addr
 		hci_devba(device, &bdaddr);
-		ba2str(&bdaddr, addr);
+		ba2str(&bdaddr, config.addr);
 	}
 	else
 	{
 		if (!config.quiet)
 			printf("Initializing device...");
-		device = hci_devid(addr);
+		device = hci_devid(config.addr);
 	}
 	
 	// Open device and catch errors
@@ -634,11 +634,11 @@ int main(int argc, char *argv[])
 	strcpy(cur_time, get_localtime());
 	
 	if (!config.daemon)
-		printf("Scan started at [%s] on %s\n", cur_time, addr);
+		printf("Scan started at [%s] on %s\n", cur_time, config.addr);
 	
 	if (config.showtime && (outfile != NULL))
 	{
-		fprintf(outfile,"[%s] Scan started on %s\n", cur_time, addr);
+		fprintf(outfile,"[%s] Scan started on %s\n", cur_time, config.addr);
 		// Make sure this gets written out
 		fflush(outfile);
 	}
@@ -647,7 +647,7 @@ int main(int argc, char *argv[])
 	if (config.bluelive)
 	{
 		fprintf(infofile,"<div class=\"sideitem\">%s Version: %s%s</div>\n", APPNAME, VERSION, VER_MOD);
-		fprintf(infofile,"<div class=\"sideitem\">Device: %s</div>\n", addr);
+		fprintf(infofile,"<div class=\"sideitem\">Device: %s</div>\n", config.addr);
 		fprintf(infofile,"<div class=\"sideitem\">Started: %s</div>\n", cur_time);
 		
 		// Think we are done with you now
