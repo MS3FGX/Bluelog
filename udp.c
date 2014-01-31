@@ -76,9 +76,9 @@ int open_udp_socket (void)
 	// Announce we've connected
 	if (config.banner)
 	{
-		char sktMsgBuffer[60] = "UDP Socket Opened from Node: ";
-		sprintf(sktMsgBuffer+strlen(sktMsgBuffer),"%s\n" , config.node_name);
-		send_udp_msg(sktMsgBuffer);
+		char MsgBuffer[256] = {0};
+		sprintf(MsgBuffer+strlen(MsgBuffer),"Version: %s Device: %s\n" , VERSION, config.addr);
+		send_udp_msg(MsgBuffer);
 	}
 	
 	// All good
