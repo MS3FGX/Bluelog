@@ -36,23 +36,6 @@ Linux AUR community repository. Bluelog is also included on the Pwn Pad and Pwn
 Plug penetration testing devices from Pwnie Express.
 
 --------------------------------------------------------------------------------
-- Linux Kernel 3.0.x Bug                                                       -
---------------------------------------------------------------------------------
-
-Please note that there is a fatal bug in the Linux 3.0.x kernel series which
-completely breaks Bluetooth scanning. This bug effects ALL software which uses
-Bluetooth, not just scanners like Bluelog. It will even hinder normal usage of
-Bluetooth, since it's pretty hard to pair a new device to your computer if you
-can't even scan for one.
-
-If your distribution is running Linux 3.0.x (such as Ubuntu 11.10 or Mint 12),
-you'll need to upgrade to AT LEAST the 3.1 series to use Bluetooth properly.
-
-You can read more about this bug on the linux-kernel mailing list:
-
-http://marc.info/?l=linux-kernel&m=131629118406044
-
---------------------------------------------------------------------------------
 - Requirements                                                                 -
 --------------------------------------------------------------------------------
 
@@ -266,6 +249,23 @@ such as verbose mode (since there is no terminal output once Bluelog goes into
 the background).
 
 --------------------------------------------------------------------------------
+- Linux Kernel 3.0.x Bug                                                       -
+--------------------------------------------------------------------------------
+
+Please note that there is a fatal bug in the Linux 3.0.x kernel series which
+completely breaks Bluetooth scanning. This bug effects ALL software which uses
+Bluetooth, not just scanners like Bluelog. It will even hinder normal usage of
+Bluetooth, since it's pretty hard to pair a new device to your computer if you
+can't even scan for one.
+
+If your distribution is running Linux 3.0.x (such as Ubuntu 11.10 or Mint 12),
+you'll need to upgrade to AT LEAST the 3.1 series to use Bluetooth properly.
+
+You can read more about this bug on the linux-kernel mailing list:
+
+http://marc.info/?l=linux-kernel&m=131629118406044
+
+--------------------------------------------------------------------------------
 - Packaging                                                                    -
 --------------------------------------------------------------------------------
 
@@ -316,6 +316,9 @@ Sven's page about CRC encoding: http://www.zorc.breitbandkatze.de/crc.html
 The device cache rewrite took inspiration, if not literal code, from
 "SpoofTooph" by .ronin. You can check out "SpoofTooph" and .ronin's other
 projects on his site: http://www.hackfromacave.com/
+
+Bluelog's UDP functions are based on code submitted by Ian Macdonald
+(ianmac51@googlemail.com).
 
 Bluelog also uses some code inspired by functions from pidfile.c by
 Martin Schulze.

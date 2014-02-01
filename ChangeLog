@@ -1,3 +1,12 @@
+01/31/14:
+	Add prefix option, print node name to UDP messages
+	Store local MAC in config struct
+	Cleanly close UDP socket
+	Update docs/man/help
+
+01/25/14:
+	Merge in WIP UDP mode code
+
 01/21/14:
 	Fix manufacturer mode not working with encode or obfuscate
 	Fix Amnesia mode not working with encode or obfuscate

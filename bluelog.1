@@ -1,5 +1,5 @@
 .\" Bluelog MAN page, based on iwconfig.8
-.TH BLUELOG 1 "01/31/2013" "Bluelog" "Bluelog Manual"
+.TH BLUELOG 1 "01/31/2014" "Bluelog" "Bluelog Manual"
 .\" NAME
 .SH NAME
 Bluelog \- Bluetooth Scanner and Logger 
@@ -56,13 +56,6 @@ no longer see any info from Bluelog in the terminal.
 .B -k
 When running an instance of Bluelog in daemon mode, the -k option can be
 used to kill it.
-.TP
-.B -l
-This option switches Bluelog over to Live mode, which uses an automatically
-updated web page to show results rather than the console and regular log files.
-See
-.B "BLUELOG LIVE"
-below for more details.
 .\" Logging options
 .SH LOGGING OPTIONS
 .TP
@@ -108,12 +101,34 @@ each device will have a unique ID generated for it. This prevents privacy
 concerns during activities such as Bluetooth traffic monitoring. Default is
 disabled.
 .TP
+.B -a <minutes>
+This option enables "amnesia mode", which causes Bluelog to forget it has
+seen a particular device after a set amount of time, given here as minutes.
+When Bluelog encounters a device it has forgotten through this option, it
+will print it to the logs again as if it was the first time it has been
+seen. A value of zero will cause Bluelog to continuously log a device as
+quickly as possible (actual speed depends on platform Bluelog is running on).
+.\" Output options
+.SH OUTPUT OPTIONS
+.TP
+.B -l
+This option switches Bluelog over to Live mode, which uses an automatically
+updated web page to show results rather than the console and regular log files.
+See
+.B "BLUELOG LIVE"
+below for more details.
+.TP
 .B -b
 This option will set the log format so that the resulting data is suitable
 for upload to ronin's Bluetooth Profiling Project (BlueProPro). This overrides
 most other logging options, and disables Bluelog Live. For more information on
 this project, and the additional steps required to submit your data for inclusion,
 visit: www.hackfromacave.com
+.TP
+.B -s
+Use this option to toggle syslog only mode. This disables the standard log
+file and writes new devices to the system log file instead. Default is
+disabled.
 .\" Advanced options
 .SH ADVANCED OPTIONS
 .TP
@@ -126,25 +141,12 @@ Bluelog will make 3 attempts to resolve a device name, using this option you
 can set that count to either be lower (faster, but less accurate), or higher
 (slower, but possibly more accurate).
 .TP
-.B -a <minutes>
-This option enables "amnesia mode", which causes Bluelog to forget it has
-seen a particular device after a set amount of time, given here as minutes.
-When Bluelog encounters a device it has forgotten through this option, it
-will print it to the logs again as if it was the first time it has been
-seen. A value of zero will cause Bluelog to continuously log a device as
-quickly as possible (actual speed depends on platform Bluelog is running on).
-.TP
 .B -w <seconds>
 This is an experimental option that allows adjusting how long Bluelog
 instructs BlueZ to scan for. Generally speaking, shorter scan times allow
 Bluelog to process the incoming data faster, but requires more processing
 power. Longer scan times should theoretically work better on lower end
 hardware.
-.TP
-.B -s
-Use this option to toggle syslog only mode. This disables the standard log
-file and writes new devices to the system log file instead. Default is
-disabled.
 .\" BASIC SCANNING
 .SH BASIC SCANNING
 There isn't a whole lot to say about this one. Start up Bluelog with the
@@ -191,6 +193,8 @@ Tom Nardi \-
 .I www.digifail.com
 .\" FILES
 .SH FILES
+.I /etc/bluelog/bluelog.conf
+.br
 .I /usr/share/bluelog
 .br
 .I /tmp/devices.log

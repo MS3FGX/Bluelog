@@ -283,11 +283,6 @@ static void help(void)
 		"\t-q                 Quiet, turns off nonessential terminal outout\n"
 		"\t-d                 Enables daemon mode, Bluelog will run in background\n"
 		"\t-k                 Kill an already running Bluelog process\n");
-		
-	// Only print this if Bluelog Live is enabled in build
-	if (LIVEMODE)
-		printf("\t-l                 Start \"Bluelog Live\", default is disabled\n");
-	
 	printf("\n");
 	printf("Logging Options:\n"		
 		"\t-n                 Write device names to log, default is disabled\n");
@@ -301,14 +296,22 @@ static void help(void)
 		"\t-t                 Write timestamps to log, default is disabled\n"
 		"\t-x                 Obfuscate discovered MACs, default is disabled\n"
 		"\t-e                 Encode discovered MACs with CRC32, default disabled\n"
-		"\t-b                 Enable BlueProPro log format, see README\n");
+		"\t-a <minutes>       Amnesia, Bluelog will forget device after given time\n");
+
+	printf("\n");
+	printf("Output Options:\n");
+	
+	// Only print this if Bluelog Live is enabled in build
+	if (LIVEMODE)
+		printf("\t-l                 Start \"Bluelog Live\", default is disabled\n");
+
+	printf("\t-b                 Enable BlueProPro log format, see README\n"
+		"\t-s                 Syslog only mode, no log file. Default is disabled\n");	
 
 	printf("\n");
 	printf("Advanced Options:\n"			
 		"\t-r <retries>       Name resolution retries, default is 3\n"
-		"\t-a <minutes>       Amnesia, Bluelog will forget device after given time\n"
 		"\t-w <seconds>       Scanning window in seconds, see README\n"		
-		"\t-s                 Syslog only mode, no log file. Default is disabled\n"
 		"\n");
 }
 

@@ -74,10 +74,6 @@ no longer see any info from Bluelog in the terminal.
 When running an instance of Bluelog in daemon mode, the -k option can be
 used to kill it.
 
-#### -l
-This option switches Bluelog over to Live mode, which uses an automatically
-updated web page to show results rather than the console and regular log files.
-
 Logging Options
 ==============
 
@@ -121,6 +117,19 @@ each device will have a unique ID generated for it. This prevents privacy
 concerns during activities such as Bluetooth traffic monitoring. Default is
 disabled.
 
+#### -a <minutes>
+This option enables "amnesia mode", which causes Bluelog to forget it has
+seen a particular device after a set amount of time, given here as minutes.
+When Bluelog encounters a device it has forgotten through this option, it
+will print it to the logs again as if it was the first time it has been
+seen, and the time found will be updated.
+
+Output Options
+==============
+
+#### -l
+This option switches Bluelog over to Live mode, which uses an automatically
+updated web page to show results rather than the console and regular log files.
 
 #### -b
 This option will set the log format so that the resulting data is suitable
@@ -128,6 +137,13 @@ for upload to ronin's Bluetooth Profiling Project (BlueProPro). This overrides
 most other logging options, and disables Bluelog Live. For more information on
 this project, and the additional steps required to submit your data for
 inclusion, visit: www.hackfromacave.com
+
+#### -s
+Use this option to toggle syslog only mode. In this mode Bluelog will not
+write its normal log file, and instead write only to the system log file
+(/var/log/syslog). This mode is especially useful when combined with a network
+aware syslog daemon, which can be used to add rudimentary central logging to
+multiple Bluelog nodes.
 
 Acknowledgements 
 ==============
@@ -153,6 +169,9 @@ Sven's page about CRC encoding: http://www.zorc.breitbandkatze.de/crc.html
 The device cache rewrite took inspiration, if not literal code, from
 "SpoofTooph" by .ronin. You can check out "SpoofTooph" and .ronin's other
 projects on his site: http://www.hackfromacave.com/
+
+Bluelog's UDP functions are based on code submitted by Ian Macdonald
+(ianmac51@googlemail.com).
 
 Bluelog also uses some code inspired by functions from pidfile.c by
 Martin Schulze.
