@@ -35,6 +35,13 @@ static void net_cfg_check (void)
 // Send string over UDP socket
 int send_udp_msg (char* msg_string)
 {  				
+	if (config.prefix)
+	{
+		// Send node name first, no newline
+		sendto(config.udp_socket, config.node_name, strlen(config.node_name), 0, (struct sockaddr *)&adr_srvr, (sizeof adr_srvr));
+		sendto(config.udp_socket, ": ", strlen(": "), 0, (struct sockaddr *)&adr_srvr, (sizeof adr_srvr));
+	}
+	
 	if ((sendto(config.udp_socket, msg_string, strlen(msg_string), 0, (struct sockaddr *)&adr_srvr, (sizeof adr_srvr))) < 0)
 	{
 		printf("Failed to send UDP message!\n");

@@ -47,6 +47,7 @@ struct cfg
 	// Network
 	int udponly;
 	int server_port;
+	int prefix;
 	int banner;
 	char node_name[MAX_VALUE_LEN];
 	char server_ip[MAX_VALUE_LEN];
@@ -81,6 +82,7 @@ struct cfg config =
 	.udp_socket = -1,
 	.server_port = 1234,
 	.banner = 0,
+	.prefix = 1,
 	.server_ip = "NULL",
 	.node_name = "NULL",
 	.addr = "NULL",
@@ -236,6 +238,8 @@ int cfg_read (void)
 					strcpy(config.node_name, value);
 				else if (strcmp(token, "BANNER") == 0)
 					config.banner = (atoi(value));
+				else if (strcmp(token, "PREFIX") == 0)
+					config.prefix = (atoi(value));
 				else
 				{
 					printf("FAILED\n");
