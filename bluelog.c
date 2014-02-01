@@ -112,11 +112,18 @@ void shut_down(int sig)
 	if (outfile != NULL)
 		fclose(outfile);
 	
+	// Only close if opened
+	if (config.udponly)
+		close(config.udp_socket);		
+	
+	// Always close these
 	free(results);
 	close(config.bt_socket);
+	
 	// Delete PID file
 	unlink(PID_FILE);
 	printf("Done!\n");
+	
 	// Log shutdown to syslog
 	syslog(LOG_INFO, "Shutdown OK.");
 	exit(sig);
