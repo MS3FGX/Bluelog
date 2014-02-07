@@ -1,3 +1,6 @@
+02/07/14:
+	Handle spaces in config file entries (Thanks, Ian)
+
 01/31/14:
 	Add prefix option, print node name to UDP messages
 	Store local MAC in config struct

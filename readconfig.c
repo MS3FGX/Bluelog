@@ -95,6 +95,15 @@ int cfg_exists (void)
   return (stat(CFG_FILE, &buffer) == 0);
 }
 
+// Trim leading spaces from values
+// Probably better way to do this...
+char* trim_space(char* s)
+{
+  while( *s==' ' )
+    memmove(s,s+1,strlen(s));
+  return s;
+}
+
 // Make sure everybody plays nice
 static void cfg_check (void)
 {
@@ -181,8 +190,8 @@ int cfg_read (void)
 		if(token != NULL && token[0] != '#')
 		{			
 			// Get token's associated value
-			value = strtok(NULL,"\t =\n\r");
-
+			value = trim_space(strtok(NULL, "\t;=\n\r"));
+								
 			if (value != NULL)
 			{
 				// Is it too large?
