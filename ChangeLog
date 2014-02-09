@@ -1,4 +1,8 @@
 02/07/14:
+	Terminate lines in config file with semicolon
+	Use yes/no in config file instead of 1/0
+
+02/07/14:
 	Handle spaces in config file entries (Thanks, Ian)
 
 01/31/14:

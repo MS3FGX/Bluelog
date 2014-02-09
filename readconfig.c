@@ -104,6 +104,20 @@ char* trim_space(char* s)
   return s;
 }
 
+// Convert yes/no to 1/0
+int eval_bool(char* value, int line)
+{
+	if (!strcasecmp(value, "YES"))
+		return 1;
+	else if (!strcasecmp(value, "NO"))
+		return 0;
+	else
+	{
+		printf("Invalid value in configuration file on line %i!\n", line);
+		exit(1);
+	}
+}
+
 // Make sure everybody plays nice
 static void cfg_check (void)
 {
@@ -204,33 +218,33 @@ int cfg_read (void)
 				
 				// See if token matches something
 				if (strcmp(token, "VERBOSE") == 0)
-					config.verbose = (atoi(value));
+					config.verbose = eval_bool(value, linenum);
 				else if (strcmp(token, "QUIET") == 0)
-					config.quiet = atoi(value);
+					config.quiet = eval_bool(value, linenum);
 				else if (strcmp(token, "DAEMON") == 0)
-					config.daemon = (atoi(value));
+					config.daemon = eval_bool(value, linenum);
 				else if (strcmp(token, "LIVEMODE") == 0)
-					config.bluelive = (atoi(value));
+					config.bluelive = eval_bool(value, linenum);
 				else if (strcmp(token, "SHOWTIME") == 0)
-					config.showtime = (atoi(value));		
+					config.showtime = eval_bool(value, linenum);		
 				else if (strcmp(token, "OBFUSCATE") == 0)
-					config.obfuscate = (atoi(value));
+					config.obfuscate = eval_bool(value, linenum);
 				else if (strcmp(token, "ENCODE") == 0)
-					config.encode = (atoi(value));				
+					config.encode = eval_bool(value, linenum);				
 				else if (strcmp(token, "SHOWCLASS") == 0)
-					config.showclass = (atoi(value));
+					config.showclass = eval_bool(value, linenum);
 				else if (strcmp(token, "FRIENDLYCLASS") == 0)
-					config.friendlyclass = (atoi(value));
+					config.friendlyclass = eval_bool(value, linenum);
 				else if (strcmp(token, "BLUEPROPRO") == 0)
-					config.bluepropro = (atoi(value));
+					config.bluepropro = eval_bool(value, linenum);
 				else if (strcmp(token, "GETNAME") == 0)
-					config.getname = atoi(value);
+					config.getname = eval_bool(value, linenum);
 				else if (strcmp(token, "AMNESIA") == 0)
 					config.amnesia = (atoi(value));
 				else if (strcmp(token, "SYSLOGONLY") == 0)
-					config.syslogonly = (atoi(value));
+					config.syslogonly = eval_bool(value, linenum);
 				else if (strcmp(token, "GETMANUFACTURER") == 0)
-					config.getmanufacturer = (atoi(value));			
+					config.getmanufacturer = eval_bool(value, linenum);			
 				else if (strcmp(token, "SCANWINDOW") == 0)
 					config.scan_window = (atoi(value));
 				else if (strcmp(token, "RETRYCOUNT") == 0)
@@ -238,7 +252,7 @@ int cfg_read (void)
 				else if (strcmp(token, "HCIDEVICE") == 0)
 					config.hci_device = (atoi(value));
 				else if (strcmp(token, "UDPONLY") == 0)
-					config.udponly = (atoi(value));
+					config.udponly = eval_bool(value, linenum);
 				else if (strcmp(token, "SERVERIP") == 0)
 					strcpy(config.server_ip, value);
 				else if (strcmp(token, "SERVERPORT") == 0)
@@ -246,9 +260,9 @@ int cfg_read (void)
 				else if (strcmp(token, "NODENAME") == 0)
 					strcpy(config.node_name, value);
 				else if (strcmp(token, "BANNER") == 0)
-					config.banner = (atoi(value));
+					config.banner = eval_bool(value, linenum);
 				else if (strcmp(token, "PREFIX") == 0)
-					config.prefix = (atoi(value));
+					config.prefix = eval_bool(value, linenum);
 				else
 				{
 					printf("FAILED\n");
