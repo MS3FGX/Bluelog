@@ -49,6 +49,7 @@ struct cfg
 	int server_port;
 	int prefix;
 	int banner;
+	int hangup;
 	char node_name[MAX_VALUE_LEN];
 	char server_ip[MAX_VALUE_LEN];
 	
@@ -83,6 +84,7 @@ struct cfg config =
 	.server_port = 1234,
 	.banner = 0,
 	.prefix = 1,
+	.hangup = 0,
 	.server_ip = "NULL",
 	.node_name = "NULL",
 	.addr = "NULL",
@@ -261,6 +263,8 @@ int cfg_read (void)
 					strcpy(config.node_name, value);
 				else if (strcmp(token, "BANNER") == 0)
 					config.banner = eval_bool(value, linenum);
+				else if (strcmp(token, "HANGUP") == 0)
+					config.hangup = eval_bool(value, linenum);
 				else if (strcmp(token, "PREFIX") == 0)
 					config.prefix = eval_bool(value, linenum);
 				else

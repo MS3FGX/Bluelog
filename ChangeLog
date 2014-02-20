@@ -1,3 +1,7 @@
+02/20/14:
+	Add option to send UDP server disconnect message
+	Update example bluelog.conf
+
 02/07/14:
 	Terminate lines in config file with semicolon
 	Use yes/no in config file instead of 1/0

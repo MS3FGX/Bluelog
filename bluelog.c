@@ -112,9 +112,16 @@ void shut_down(int sig)
 	if (outfile != NULL)
 		fclose(outfile);
 	
-	// Only close if opened
+	// UDP cleanup
 	if (config.udponly)
-		close(config.udp_socket);		
+	{
+		// Send message if configured
+		if (config.hangup)
+			send_udp_msg("Disconnect\n");
+		
+		// Close socket
+		close(config.udp_socket);
+	}
 	
 	// Always close these
 	free(results);
