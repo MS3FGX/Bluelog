@@ -23,6 +23,9 @@ DOCS = ChangeLog COPYING README README.LIVE
 # Livelog.cgi prefix
 CGIPRE = www/cgi-bin/
 
+# OUI script
+OUISCRIPT = scripts/gen_oui.sh
+
 # Targets
 # Build Bluelog
 bluelog: bluelog.c
@@ -34,7 +37,7 @@ livelog: livelog.c
 
 # Download OUI file
 ouifile:
-	./gen_oui.sh check
+	$(OUISCRIPT) check
 
 # Build tarball
 release: clean
