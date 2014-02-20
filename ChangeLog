@@ -1,6 +1,7 @@
 02/20/14:
 	Add option to send UDP server disconnect message
 	Update example bluelog.conf
+	Add simple UDP server script
 
 02/07/14:
 	Terminate lines in config file with semicolon
