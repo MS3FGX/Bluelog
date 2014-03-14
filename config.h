@@ -11,22 +11,15 @@
 // OpenWRT
 #ifdef OPENWRT
 #define VER_MOD "-WRT"
-// Maximum number of devices in cache
 #define MAX_DEV 2048
-// Toggle Bluelog Live
 #define LIVEMODE 1
-// Toggle OUI lookups
 #define OUILOOKUP 0
-// Default log
 #define OUT_PATH "/tmp/"
-// Bluelog Live device list
 #define LIVE_OUT "/tmp/live.log"
-// Bluelog Live status info
 #define LIVE_INF "/tmp/info.txt"
-// PID storage
 #define PID_FILE "/tmp/bluelog.pid"
-// File for OUI database
 #define OUIFILE ""
+#define CFG_FILE "/etc/bluelog/bluelog.conf"
 // Pwnie Express Pwn Plug
 #elif PWNPLUG
 #define VER_MOD "-PWN"
@@ -38,6 +31,7 @@
 #define LIVE_INF "/tmp/info.txt"
 #define PID_FILE "/tmp/bluelog.pid"
 #define OUIFILE ""
+#define CFG_FILE "/etc/bluelog/bluelog.conf"
 // Pwnie Express Pwn Pad
 #elif PWNPAD
 #define VER_MOD "-PAD"
@@ -49,6 +43,7 @@
 #define LIVE_INF ""
 #define PID_FILE "/tmp/bluelog.pid"
 #define OUIFILE "/usr/share/bluelog/oui.txt"
+#define CFG_FILE "/etc/bluelog/bluelog.conf"
 #else
 // Generic x86
 #define VER_MOD ""
