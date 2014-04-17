@@ -1,6 +1,6 @@
 #!/bin/bash
 # Generate OUI list for libmackerel
-VER="1.2"
+VER="1.3"
 
 # Location of tmp file
 TMPFILE="/tmp/oui.tmp"
@@ -32,12 +32,19 @@ echo "OK"
 format_file ()
 {
 echo -n "Reformatting..."
+# Isolate MAC and manufacturer
 grep "(hex)" $TMPFILE | awk '{print $1","$3,$4,$5,$6,$7,$8}' | \
 	sed 's/ *$//; /^$/d' > $OUIFILE || \
 	ErrorMsg ERR "Unable to reformat file! Is awk/sed installed?"
 
+# Use colon in MAC addresses
 sed -i 's/-/:/g' $OUIFILE || \
-	ErrorMsg ERR "Unable to run sed!"
+	ErrorMsg ERR "Unable to format MACs!"
+
+# Remove commas from manufacturer names
+sed -i 's/,//g2' $OUIFILE || \
+	ErrorMsg ERR "Unable to format manufacturers!"
+
 echo "OK"
 }
 
