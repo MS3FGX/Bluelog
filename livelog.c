@@ -26,7 +26,7 @@
 #if defined OPENWRT || PWNPLUG
 #define CSSPREFIX "/bluelog/"
 #else
-#define CSSPREFIX "/"
+#define CSSPREFIX "../"
 #endif
 
 // Global variables
