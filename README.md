@@ -105,6 +105,12 @@ option. Default is disabled.
 Use this option to toggle displaying timestamps for both the start and end
 of the scan and each new device found in the log file. Default is disabled.
 
+#### -g
+Use this option to track chanGes in the status of a device (new, gone, 
+returned). There is a grace period of 10 successive scans to reduce false 
+positives. If a device is offline for longer than that, it is marked as gone.  
+Default is disabled.
+
 #### -x
 Use this option to toggle MAC address obfuscation. With this option
 enabled, Bluelog will display the manufacturer portion of each discovered
