@@ -995,7 +995,7 @@ int main(int argc, char *argv[])
 				// Determine if device still present
 				if (strcmp (addr, dev_cache[ri].priv_addr) == 0)
 				{
-					strcpy(dev_cache[ri].status, "online");
+
 					break;
 				}
 
