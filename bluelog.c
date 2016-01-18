@@ -55,7 +55,7 @@ struct btdev
 	uint8_t minor_class;
 	uint8_t print;
 	uint8_t seen;
-	char status[8];
+	char status[9];
 	uint8_t missing_count;
 };
 
