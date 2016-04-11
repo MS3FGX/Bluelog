@@ -52,9 +52,9 @@ h4, h4 a
 
 	/* Font, taken Plug UI CSS */
 	color: #cccccc;
-	-moz-text-shadow: 2px 2px 2px #000000;
+	/*-moz-text-shadow: 2px 2px 2px #000000;
 	-webkit-text-shadow: 2px 2px 2px #000000;
-	text-shadow: 2px 2px 2px #000000;
+	text-shadow: 2px 2px 2px #000000;*/
 }
 	
 /* Banish footer bar to bottom of container object */
