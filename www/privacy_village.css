@@ -26,11 +26,13 @@ h4, h4 a
 #header
 {
 	/* Logo, can change in CSS without touching HTML */
-	background-image: url('images/bluelog_type.png');
+	background-image: url('images/privacy_village_banner.png');
 	background-repeat: no-repeat;
-	background-position: 50% 55%;
-	background-color: #0160b0;
-	height: 250px;
+	background-position: left;
+	background-color: #ffffff;
+	/* Remove DF logo */
+	text-indent: -9999px;
+	height: 300px;
 	position: relative;
 }
 #container h1
