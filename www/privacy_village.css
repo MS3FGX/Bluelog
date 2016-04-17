@@ -26,7 +26,7 @@ h4, h4 a
 #header
 {
 	/* Logo, can change in CSS without touching HTML */
-	background-image: url('images/privacy_village_banner.png');
+	background-image: url('images/privacy_village.png');
 	background-repeat: no-repeat;
 	background-position: left;
 	background-color: #ffffff;
