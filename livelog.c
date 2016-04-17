@@ -349,8 +349,14 @@ int main(int argc, char *argv[])
 	if(getuid() == 0)
 	{
 		syslog(LOG_ERR,"CGI module refusing to run as root!");
-		printf("Server attempting to run CGI module as root, bailing out!\n");
-		printf("Check your web server configuration and try again.\n");
+		
+		// Make sure error message is themed
+		print_header(CSSFILE);
+		puts("<div id=\"content\">");
+		puts("Server attempting to run CGI module as root, bailing out!");
+		puts("<p>");
+		puts("Check your web server configuration and try again.");
+		puts("</body></html>");
 		exit(1);
 	}
 	#endif
