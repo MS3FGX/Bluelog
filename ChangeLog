@@ -1,3 +1,6 @@
+04/21/16:
+	Do basic HTML check before displaying device name in Live, blocks "Tribeca Exploit"
+
 04/17/16:
 	Theme error message about CGI running as root
 	Add DEFCON Privacy Village theme for Bluelog Live, thanks Teresa

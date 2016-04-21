@@ -165,6 +165,11 @@ void print_devices()
 		printf("<tr>");
 		printf("<td>%s</td>",dev_cache[device_index-1].time);		
 		printf("<td>%s</td>",dev_cache[device_index-1].addr);	
+		
+		// Before writing out device name to HTML, do some VERY basic sanitization (not safe, just to block obvious stuff)		
+		if ((strstr(dev_cache[device_index-1].name, ">")) || (strstr(dev_cache[device_index-1].name, "</")))
+			strcpy(dev_cache[device_index-1].name, "<p style='color:red;'>Blocked Possible Exploit</p>");
+
 		printf("<td>%s</td>",dev_cache[device_index-1].name);	
 		printf("<td>%s</td>",dev_cache[device_index-1].class);	
 		
