@@ -1,3 +1,6 @@
+07/19/17:
+	Switch to using OUI list from linuxnet.ca
+
 04/21/16:
 	Do basic HTML check before displaying device name in Live, blocks "Tribeca Exploit"
 

@@ -1,9 +1,13 @@
 #!/bin/bash
 # Generate OUI list for libmackerel
-VER="1.3"
+VER="1.4"
+
+# File to download
+DLFILE="http://linuxnet.ca/ieee/oui.txt.gz"
 
 # Location of tmp file
-TMPFILE="/tmp/oui.tmp"
+TMPDIR="/tmp"
+TMPFILE="/tmp/out.tmp"
 
 # File to write
 OUIFILE="oui.txt"
@@ -22,11 +26,19 @@ exit 1
 
 get_oui ()
 {
-echo -n "Downloading OUI file from IEEE..."
-wget --quiet -O $TMPFILE http://standards.ieee.org/develop/regauth/oui/oui.txt || \
-	ErrorMsg ERR "Unable to contact IEEE server!"
+echo -n "Downloading OUI file from $DLFILE..."
+wget --quiet -P $TMPDIR $DLFILE || \
+	ErrorMsg ERR "Unable to contact server!"
 
 echo "OK"
+}
+
+expand_file ()
+{
+	echo -n "Decompressing..."
+	gunzip $TMPDIR/oui.txt.gz
+	cp $TMPDIR/oui.txt $TMPFILE
+	echo "OK"
 }
 
 format_file ()
@@ -61,6 +73,7 @@ case $1 in
 'force')
 	clean_all
 	get_oui
+	expand_file
 	format_file
 ;;
 'clean')
@@ -71,11 +84,12 @@ case $1 in
 	if [ ! -f $OUIFILE ];
 	then
 		get_oui
+		expand_file
 		format_file
 		echo "Done."
 		exit 0
 	fi
-	
+
 	# If we get here, it does
 	echo "OUI file exists, skipping."
 ;;
