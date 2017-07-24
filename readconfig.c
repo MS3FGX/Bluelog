@@ -29,6 +29,7 @@ struct cfg
 	
 	// Logging 
 	int showtime;
+	int status;
 	int obfuscate;
 	int encode;
 	int showclass;
@@ -67,6 +68,7 @@ struct cfg config =
 	.daemon = 0,
 	.bluelive = 0,
 	.showtime = 0,
+	.status = 0,
 	.obfuscate = 0,
 	.encode = 0,
 	.showclass = 0,
@@ -141,6 +143,10 @@ static void cfg_check (void)
 	// If retry is different from default, assume names are on.
 	if (config.retry_count != 3)
 		config.getname = 1;
+
+	// Set timestamps when observing status changes
+	if (config.status)
+		config.showtime = 1;
 
 	// No verbose for daemon
 	if (config.daemon)
