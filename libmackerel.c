@@ -195,6 +195,14 @@ char* mac_get_vendor (char* full_mac)
 	// Return OUI (also verify)
 	strncpy(oui, mac_get_oui(full_mac), 9);
 	
+	/* This is hacky, but the OUI files are in 00-11-22 format sooo...
+		On debian to get the latest: apt install ieee-data
+		file is usually at "/usr/share/ieee-data/oui.txt"
+	*/
+	oui[2] = '-';
+	oui[5] = '-';
+	
+	
 	struct stat st;
 	char *str, *map, *off, *end;
 	int fd;
